@@ -13,6 +13,11 @@ These files are review records, not the normative specification. The active spec
 
 - Date: 2026-06-02
 - Environment: local Codex sessions
+- Agent: Codex
+- Model: GPT-5.5
+- Reasoning effort: high
+- Local skills used:
+  - `superpowers`
 - Inputs: repository documentation, skill files, reference files, and templates
 - External tools: no code graph or repository-analysis tool was required for the review prompts
 - Purpose: evaluate whether the skill is clear, safe, token-efficient, and executable by future coding agents
