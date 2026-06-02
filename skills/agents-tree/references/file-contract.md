@@ -40,6 +40,12 @@ agents_tree_skip: []
 
 Keep `agents_tree_keep` and `agents_tree_skip` very small. Prefer existing `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, or tool-specific ignore files for normal exclusions.
 
+`agents_tree_keep` must not reopen secrets, credentials, dependency directories, build outputs, generated artifacts, or vendored code unless a human explicitly asks for that exact path in the current task. Broad keep globs are invalid.
+
+If `owner: human-maintained`, do not edit any part of the file unless the user explicitly asks to edit that human-owned file. Section markers do not override whole-file ownership.
+
+If no usable commit SHA exists, use `last_verified_commit: unknown`, set `confidence: low`, and do not classify the file as `VALID`.
+
 ## Managed Sections
 
 Generated content must live inside:
@@ -60,6 +66,46 @@ Human-maintained content must live inside:
 
 Agents may update generated sections after reviewing evidence. Agents must not rewrite human sections unless the user explicitly asks.
 
+Before editing, parse section markers:
+
+- exactly one generated section is required for refresh
+- at most one human section is allowed
+- starts and ends must be paired, ordered, and not nested
+- malformed markers make the file `INVALID`
+
+If an existing `AGENTS.md` lacks managed markers, treat all existing body text as human-maintained by default. Preserve it byte-for-byte unless the user explicitly asks to normalize it.
+
+## Knowledge Status
+
+Generated files should include a visible status section near the top of the generated block:
+
+```md
+## Knowledge Status
+
+- Last verified: `abc123`
+- Confidence: medium
+- Critical evidence: `src/example.ts`, `ExampleService`
+- Re-check before trusting this file if those files, symbols, or related flows changed.
+```
+
+This section helps humans and agents that do not have Agents Tree installed notice when knowledge should be re-checked.
+
+## Evidence Notes
+
+Generated claims should be easy to verify without rereading broad code areas.
+
+Use a short visible section when a file contains more than a few generated claims:
+
+```md
+## Evidence Notes
+
+- Responsibility: supported by `src/example.ts` and `ExampleService`.
+- Entry points: supported by `src/index.ts`.
+- Cross-module check: inspect current references before changing `ExampleService` response shape.
+```
+
+Keep evidence notes concise. Do not turn them into a citation table or live dependency list.
+
 ## Conflict Sections
 
 If generated knowledge conflicts with human text, record the conflict in the file instead of overwriting either side:
@@ -71,7 +117,11 @@ detected_at_commit: abc123
 detected_by: agent
 conflict_type: human_generated_mismatch
 related_files:
-  - src/example.ts
+  - "[src/example.ts](src/example.ts)"
+related_agents:
+  - "[src/other-module/AGENTS.md](src/other-module/AGENTS.md)"
+impacted_modules:
+  - OtherModule
 
 # Unresolved Agents Tree Conflict
 
@@ -92,7 +142,11 @@ Summarize the human-maintained claim.
 
 ## Code Evidence
 
-Summarize the current code evidence.
+Summarize the current code evidence. Use relative Markdown links for known concrete files, for example `[src/example.ts](src/example.ts)`.
+
+## Cross-Module Context
+
+Summarize only the external module knowledge needed for human judgment, including relevant neighboring `AGENTS.md` claims or graph evidence.
 
 ## Required Resolution
 
@@ -106,12 +160,27 @@ After a human resolves the conflict, remove the conflict block or change `status
 
 Conflict blocks must be self-explanatory. Humans and agents that have not installed Agents Tree should still understand that the local `AGENTS.md` guidance is not authoritative until the conflict is resolved.
 
+Conflict blocks are allowed to include cross-module context because they are human decision records, not ordinary module knowledge. Include only what helps resolve the conflict. Do not use conflict blocks to create permanent dependency maps.
+
+When writing conflict blocks, use relative Markdown links for concrete files, tests, and `AGENTS.md` nodes whenever the path is already known. Do not invent links or scan broadly just to add links.
+
+Allowed `conflict_type` values:
+
+- `human_generated_mismatch`
+- `parent_child_mismatch`
+- `missing_critical_evidence`
+- `scope_mismatch`
+
+Parent/child instruction mismatches are conflicts even when both claims are generated.
+
 ## Recommended Sections
 
 Root and module files should use a small subset of:
 
 ```md
 # Module Overview
+# Knowledge Status
+# Evidence Notes
 # Architecture
 # Entry Points
 # Common Tasks
@@ -131,3 +200,14 @@ Classify the file:
 - `INVALID`: critical evidence changed enough that the file must not be trusted.
 
 Use code-intelligence tools when available. If they are unavailable, use focused file reads and Git history. Do not infer validity from unchanged filenames alone.
+
+Decision checklist:
+
+- Missing or malformed metadata or managed markers: `INVALID`.
+- Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until the new evidence is verified.
+- Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
+- Changed critical file with stable responsibility and key flows after focused review: `STALE_WARNING`.
+- No relevant recorded evidence or current references/flows changed: `VALID`.
+- Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
+
+Advance `last_verified_commit` only after checking every recorded critical file and symbol, plus current diffs or code-intelligence evidence that affects generated claims. Do not advance it when any recorded evidence cannot be checked.

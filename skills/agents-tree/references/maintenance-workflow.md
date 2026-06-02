@@ -53,18 +53,30 @@ Do not write lists of current callers, imports, or references into `AGENTS.md` u
 
 ## Evidence Collection
 
-Prefer the cheapest reliable evidence:
+Separate instruction reading from evidence discovery:
 
-1. existing `AGENTS.md` files
-2. project ignore files such as `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, and tool-specific ignore files
-3. code graph, code-intelligence, structural search, or language-aware navigation tools
-4. focused source reads
-5. relevant tests or verification commands
-6. Git diffs and recent history
+1. Read applicable `AGENTS.md` files for instructions and local knowledge.
+2. Apply project ignore files before discovering candidate evidence files.
+3. Apply `agents_tree_skip` after project ignore files.
+4. Apply `agents_tree_keep` only for rare reviewed exceptions.
+5. Prefer code graph, code-intelligence, structural search, or language-aware navigation tools for cross-module impact.
+6. Use focused source reads, relevant tests, Git diffs, and recent history only as needed.
 
 Avoid broad source scans unless the existing knowledge is missing or invalid.
 
 Use ignore files before applying `agents_tree_skip`. Use `agents_tree_keep` only for a small number of paths that must remain visible despite broad ignore patterns.
+
+`agents_tree_keep` must not reopen secrets, credentials, dependency directories, build outputs, generated artifacts, or vendored code unless a human explicitly asks for that exact path in the current task.
+
+If code graph or code-intelligence tools are unavailable, use this bounded sequence:
+
+1. current diff
+2. recorded `critical_files`
+3. recorded `critical_symbols`
+4. nearest imports, exports, and type declarations around named symbols
+5. focused textual references for named symbols only
+
+Stop when there is enough evidence to classify freshness, or report that validity cannot be established.
 
 ## Refresh Discipline
 
@@ -79,6 +91,8 @@ When refreshing:
 
 If the user asks for a check-only pass, report findings without editing files.
 
+In check mode, stop after reporting freshness status, evidence reviewed, and recommended next action. Do not modify `AGENTS.md` or metadata unless the user explicitly requested refresh, update, or write.
+
 ## Conflict Handling
 
 Treat these as conflicts:
@@ -87,6 +101,7 @@ Treat these as conflicts:
 - generated text would reverse or weaken a human rule
 - a critical file or symbol disappeared
 - parent and child `AGENTS.md` files give incompatible instructions
+- a module split, merge, rename, or move changes the tree scope
 
 Do not resolve conflicts silently. Record the exact file, competing claims, and code evidence in an `agents-tree:conflict` block.
 
@@ -104,3 +119,27 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 If a file already has an unresolved conflict block, do not refresh that file or any child `AGENTS.md` under its directory. Continue with unrelated files when they do not depend on the conflicted subtree.
 
 Write conflict blocks so they are understandable without this skill installed. The marker is for tools; the visible Markdown body is for humans and ordinary agents.
+
+Conflict blocks may include cross-module context when needed for human judgment. This is an explicit exception to normal `AGENTS.md` cohesion. Include impacted modules, relevant neighboring `AGENTS.md` claims, and current graph/search evidence only when they help resolve the conflict.
+
+Use relative Markdown links in conflict blocks for known files, tests, and `AGENTS.md` nodes so humans can jump directly to evidence. Do not invent links or broaden the scan only to add links.
+
+Examples:
+
+- An unresolved conflict in `src/payments/AGENTS.md` blocks refreshing `src/payments/**/AGENTS.md`.
+- It does not block refreshing `src/search/AGENTS.md`.
+- It does not block ordinary code edits under `src/payments/`, but agents must inspect source evidence directly instead of relying on the conflicted guidance.
+
+Before refreshing any child `AGENTS.md`, read applicable ancestor `AGENTS.md` files and stop if an unresolved ancestor conflict covers the target path.
+
+## Scope Moves
+
+If a module split, merge, rename, or move changes directory ownership, classify affected `AGENTS.md` files as `INVALID` first.
+
+Update the tree shape explicitly after verifying the new scope:
+
+- retire old nodes that no longer own useful knowledge
+- move or recreate nodes at the new directory boundary
+- create child nodes only where they reduce future reasoning cost
+
+Do not hide a scope move inside a normal generated-section refresh.

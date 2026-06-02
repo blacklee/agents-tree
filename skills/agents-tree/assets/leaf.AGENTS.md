@@ -13,6 +13,15 @@ agents_tree_skip: []
 # Implementation Notes
 
 <!-- agents-tree:generated:start -->
+## Knowledge Status
+
+- Last verified: `COMMIT_SHA`
+- Confidence: low
+- Critical evidence: update `critical_files` and `critical_symbols` in front matter.
+- Re-check before trusting this file if those files, symbols, or related flows changed.
+
+<!-- Delete unused generated headings before committing this file. Include implementation details only when stable. -->
+
 ## Local Responsibility
 
 Describe the specific implementation owned by this directory.

@@ -13,6 +13,15 @@ agents_tree_skip: []
 # Project Knowledge Index
 
 <!-- agents-tree:generated:start -->
+## Knowledge Status
+
+- Last verified: `COMMIT_SHA`
+- Confidence: high
+- Critical evidence: update `critical_files` and `critical_symbols` in front matter.
+- Re-check before trusting this file if those files, symbols, or related flows changed.
+
+<!-- Delete unused generated headings before committing this file. Root files should stay index-like. -->
+
 ## Overview
 
 Briefly describe the project purpose and the major source areas.

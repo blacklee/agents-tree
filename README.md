@@ -49,7 +49,7 @@ The skill itself is not the knowledge tree. It is the maintenance workflow. The 
 
 Agents Tree is not meant to be another general-purpose agent memory store.
 
-It is designed around four constraints:
+It is designed around five constraints:
 
 - **Directory scope**: knowledge follows the same tree as the source code.
 - **Freshness checks**: every generated knowledge file records what code evidence it was verified against.
@@ -76,10 +76,14 @@ critical_symbols:
   - HPPlayerConfig
 confidence: medium
 owner: ai-generated
+agents_tree_keep: []
+agents_tree_skip: []
 ---
 ```
 
 The metadata gives agents and tools enough information to ask: "Is this knowledge still valid, or should I inspect the code again?"
+
+Generated sections should also include a short visible `Knowledge Status` section so ordinary `AGENTS.md` readers can notice when to re-check.
 
 ## Freshness States
 
@@ -195,6 +199,10 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
 
 The marker is machine-readable, but the body must also be clear to humans and agents that have not installed Agents Tree.
+
+Conflict blocks are allowed to include the minimal cross-module context needed for human judgment. This exception should not leak into ordinary generated sections.
+
+Use relative Markdown links for known files and related `AGENTS.md` nodes inside conflict blocks so reviewers can jump to the evidence.
 
 ## Keep And Skip
 

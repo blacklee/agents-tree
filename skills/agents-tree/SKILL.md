@@ -20,6 +20,14 @@ This skill is only the maintenance workflow. The knowledge tree belongs to the t
 
 If the user only asks to check, inspect, analyze, or review, do not edit files unless they explicitly approve edits.
 
+## Mode Selection
+
+- User asks to add missing guidance, start a tree, or avoid repeated scans: **Create**.
+- User asks whether current knowledge is trustworthy, stale, valid, or safe to use: **Check**.
+- User asks to update, refresh, rewrite generated knowledge, or record changed project knowledge: **Refresh**.
+- User asks to evaluate proposed `AGENTS.md` changes: **Review**.
+- If wording is ambiguous, choose **Check** and recommend the next action instead of editing.
+
 ## Update Triggers
 
 Consider updating the tree when work changes stable knowledge that future agents need:
@@ -37,12 +45,22 @@ Do not update the tree for every code change. Update it only when the change aff
 
 1. Identify the target project and requested mode.
 2. Read the nearest applicable `AGENTS.md` files first.
-3. Use available code graph, code-intelligence, Git diff, language, or focused source-read tools to gather only the needed evidence.
-4. Decide whether the target directory needs an `AGENTS.md`; do not create files just because a directory exists.
-5. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
-6. Update only managed generated sections unless the user explicitly asks to edit human sections.
-7. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
-8. Summarize touched files, evidence reviewed, freshness status, and unresolved conflicts.
+3. Validate ownership and section markers before editing.
+4. Stop knowledge-tree maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
+5. Use available code graph, code-intelligence, Git diff, language, or focused source-read tools to gather only the needed evidence.
+6. Decide whether the target directory needs an `AGENTS.md`; do not create files just because a directory exists.
+7. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
+8. Update only managed generated sections unless the user explicitly asks to edit human sections.
+9. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
+10. Summarize touched files, evidence reviewed, freshness status, and unresolved conflicts.
+
+## Section Safety
+
+- If an existing `AGENTS.md` has no managed markers, treat all existing body text as human-maintained. Preserve it unless the user explicitly asks to normalize it.
+- Require exactly one well-ordered generated section before refresh. Allow at most one well-ordered human section.
+- Missing, duplicated, nested, or out-of-order markers make the file `INVALID`; do not edit generated content until repaired or explicitly normalized.
+- `owner: human-maintained` blocks all edits to the file unless the user explicitly asks to edit that human-owned file.
+- Before refreshing a child `AGENTS.md`, check applicable ancestors for unresolved conflict blocks that cover the target path.
 
 ## Cross-Module Handoff
 
@@ -96,7 +114,13 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 
 If an unresolved conflict block exists, do not refresh that `AGENTS.md` file or its subtree unless the user explicitly asks to resolve the conflict.
 
+Use canonical conflict types from `references/file-contract.md`: `human_generated_mismatch`, `parent_child_mismatch`, `missing_critical_evidence`, or `scope_mismatch`.
+
+Conflict blocks are an exception to normal module cohesion. Include the smallest cross-module context needed for a human to decide, such as impacted modules, relevant neighboring `AGENTS.md` claims, and code graph evidence. Keep ordinary generated sections cohesive and local.
+
 Generated claims must be traceable to files, symbols, imports, execution flows, tests, or explicit human notes.
+
+Use short `Evidence Notes` for generated files with multiple claims; do not write live dependency lists.
 
 ## Freshness Labels
 
@@ -105,6 +129,17 @@ Generated claims must be traceable to files, symbols, imports, execution flows, 
 - `INVALID`: critical files, symbols, ownership boundaries, or flows changed enough that agents must not trust the knowledge without rereading code.
 
 Treat stale or invalid knowledge as worse than missing knowledge.
+
+Decision checklist:
+
+- Missing or malformed metadata or markers: `INVALID`.
+- Deleted, renamed, or missing critical file or symbol: `INVALID` until re-evidenced.
+- Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
+- Changed critical file with the same responsibility and key flows after focused review: `STALE_WARNING`.
+- No relevant recorded evidence or current references/flows changed: `VALID`.
+- Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
+
+Advance `last_verified_commit` only after checking every recorded critical file and symbol plus current diffs or graph evidence affecting generated claims.
 
 ## Templates And Details
 

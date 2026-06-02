@@ -49,7 +49,7 @@ project/
 
 Agents Tree 不主打“记住所有东西”。
 
-它主打四件事：
+它主打五件事：
 
 - **目录作用域**：知识结构和源码目录结构一致。
 - **新鲜度检测**：每份生成知识都记录它基于哪些代码证据。
@@ -88,6 +88,8 @@ critical_symbols:
   - HPPlayerConfig
 confidence: medium
 owner: ai-generated
+agents_tree_keep: []
+agents_tree_skip: []
 ---
 ```
 
@@ -98,6 +100,8 @@ owner: ai-generated
 ```
 
 如果不可信，就不要盲信 `AGENTS.md`，而应该重新扫描代码。
+
+自动生成区也应该包含简短可见的 `Knowledge Status`，让普通 `AGENTS.md` 读者也能知道什么时候需要重新复查。
 
 ## 新鲜度状态
 
@@ -213,6 +217,10 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 未解决冲突会阻止这个 `AGENTS.md` 文件及其子树继续被维护，但不阻止无关代码工作，也不阻止维护无关的知识树节点。
 
 marker 是给工具识别的，但区块正文必须让没有安装 Agents Tree 的人类和普通 Agent 也能看懂。
+
+冲突区块允许包含辅助人工判断所需的最小跨模块上下文。这是普通 `AGENTS.md` 内聚规则的例外，不应该扩散到普通自动生成区。
+
+冲突区块里已知路径的源码文件、测试文件和相关 `AGENTS.md` 节点应使用相对 Markdown 链接，方便人工直接跳转。
 
 ## Keep 和 Skip
 

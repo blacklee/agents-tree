@@ -81,6 +81,10 @@ Human-maintained content must be placed inside:
 
 Refresh logic must preserve human sections unless it detects a direct contradiction. In that case, report the conflict and require human review instead of overwriting the section.
 
+Before editing any target `AGENTS.md`, validate section markers. Missing, duplicated, nested, or out-of-order managed markers make the file invalid for automated refresh.
+
+If an existing target `AGENTS.md` has no managed markers, treat the existing body as human-maintained by default.
+
 Conflicts must be recorded with:
 
 ```md
@@ -98,6 +102,12 @@ An unresolved conflict blocks maintenance of that `AGENTS.md` file and its subtr
 
 Conflict blocks must remain understandable to humans and agents that have not installed this skill.
 
+Generated sections should include visible `Knowledge Status` text so ordinary `AGENTS.md` readers can see when to re-check the file.
+
+Conflict blocks may include minimal cross-module context for human judgment; ordinary generated sections should remain cohesive to their directory.
+
+Conflict blocks should use relative Markdown links for known files and related `AGENTS.md` nodes when doing so helps human review.
+
 ## Knowledge Rules
 
 - Root `AGENTS.md` files should act as indexes, not encyclopedias.
@@ -105,6 +115,7 @@ Conflict blocks must remain understandable to humans and agents that have not in
 - Leaf files may include implementation details only when they are stable enough to be useful.
 - Every generated claim should be traceable to files, symbols, imports, execution flows, or explicit human notes.
 - Stale knowledge should be surfaced clearly instead of silently trusted.
+- `last_verified_commit` should advance only after all recorded critical evidence and relevant current diffs or graph evidence have been checked.
 
 ## Implementation Rules
 
