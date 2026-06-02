@@ -121,6 +121,25 @@ The primary workflow is skill-driven, conversational, and file-based:
 
 Automation can be added later, but it should be optional. The core contract must remain useful with only normal agent conversations, the skill instructions, and manual editing.
 
+## Skill Package
+
+The reusable skill lives in:
+
+```text
+skills/agents-tree/
+├── SKILL.md
+├── agents/openai.yaml
+├── references/
+│   ├── file-contract.md
+│   └── maintenance-workflow.md
+└── assets/
+    ├── root.AGENTS.md
+    ├── module.AGENTS.md
+    └── leaf.AGENTS.md
+```
+
+`SKILL.md` stays concise so agents can load it cheaply. References hold detailed rules. Assets provide templates that agents can copy into target projects.
+
 ## When To Add Files
 
 Create an `AGENTS.md` file only where it earns its keep.

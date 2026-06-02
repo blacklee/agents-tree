@@ -139,6 +139,25 @@ Agents Tree 不需要专门的 CLI。
 
 以后可以加自动化工具，但自动化只是可选能力。核心契约必须在“skill 说明 + 正常和 Agent 对话 + 手动编辑文件”的场景下就能成立。
 
+## Skill 包结构
+
+可复用的 skill 放在：
+
+```text
+skills/agents-tree/
+├── SKILL.md
+├── agents/openai.yaml
+├── references/
+│   ├── file-contract.md
+│   └── maintenance-workflow.md
+└── assets/
+    ├── root.AGENTS.md
+    ├── module.AGENTS.md
+    └── leaf.AGENTS.md
+```
+
+`SKILL.md` 保持短小，方便 Agent 低成本加载。详细规则放在 `references/`。可复制到目标项目的 `AGENTS.md` 模板放在 `assets/`。
+
 ## 什么时候新增文件
 
 只在值得维护知识的目录新增 `AGENTS.md`。

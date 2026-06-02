@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agents Tree"
+  short_description: "Maintain verified AGENTS.md knowledge trees"
+  default_prompt: "Use $agents-tree to create or refresh this project knowledge tree."

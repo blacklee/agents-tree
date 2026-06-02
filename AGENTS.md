@@ -40,6 +40,13 @@ The project must remain useful without a dedicated CLI. The primary workflow is:
 
 Avoid adding servers, dashboards, embeddings, databases, background daemons, or required CLIs until the skill workflow and file contract are proven useful.
 
+## Repository Layout
+
+- `skills/agents-tree/SKILL.md`: concise operational workflow loaded by agents.
+- `skills/agents-tree/references/`: detailed contract and maintenance guidance loaded only when needed.
+- `skills/agents-tree/assets/`: templates copied into target projects.
+- `README.md` and `README.zh.md`: public project explanation.
+
 ## File Contract
 
 Generated `AGENTS.md` files should use YAML front matter for knowledge metadata.
