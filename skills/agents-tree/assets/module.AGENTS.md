@@ -25,6 +25,10 @@ Describe stable boundaries, collaborators, and data flow.
 
 - `path/to/file`: why agents usually start here.
 
+## Cross-Module Checks
+
+- Stable boundary: when changing this interface or data shape, inspect current references with a code graph or code-intelligence tool before editing related modules.
+
 ## Common Tasks
 
 - Task: files or symbols usually involved.

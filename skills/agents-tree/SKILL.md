@@ -37,12 +37,23 @@ Do not update the tree for every code change. Update it only when the change aff
 
 1. Identify the target project and requested mode.
 2. Read the nearest applicable `AGENTS.md` files first.
-3. Use available code-intelligence tools, Git diffs, language data, or focused source reads to gather only the needed evidence.
+3. Use available code graph, code-intelligence, Git diff, language, or focused source-read tools to gather only the needed evidence.
 4. Decide whether the target directory needs an `AGENTS.md`; do not create files just because a directory exists.
 5. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
 6. Update only managed generated sections unless the user explicitly asks to edit human sections.
 7. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
 8. Summarize touched files, evidence reviewed, freshness status, and unresolved conflicts.
+
+## Cross-Module Handoff
+
+Keep each `AGENTS.md` cohesive to its own directory. Do not maintain complete cross-module dependency maps in the tree.
+
+When a task touches critical symbols, APIs, data shapes, call flows, ownership boundaries, or other cross-module seams:
+
+1. Use a code graph or code-intelligence tool to find real callers, callees, references, and impact.
+2. If the result points to another module, read that module's nearest `AGENTS.md` before editing across the boundary.
+3. Record only stable handoff guidance, such as when to inspect references before changing an interface.
+4. Do not copy live dependency lists into `AGENTS.md`; those belong in graph/search tools.
 
 ## File Contract
 

@@ -18,7 +18,7 @@ Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如�
 - 判断旧文档是否可信
 - 每次改动前重新做一轮架构推理
 
-GitNexus、Graphify、repo map、语义搜索这类工具可以降低“读代码”的成本。Agents Tree 关注另一部分成本：重复推理。
+代码图、repo map、语义搜索这类工具可以降低“读代码”的成本。Agents Tree 关注另一部分成本：重复推理。
 
 它通过指导 Agent 在目标项目目录中维护一棵 `AGENTS.md` 文件树来解决这个问题。越靠近根目录，内容越像索引；越靠近代码叶子目录，内容越具体。
 
@@ -107,7 +107,7 @@ Agents Tree 计划把知识状态分成三类：
 - `STALE_WARNING`：相关证据发生变化，但模块形态大体还在。
 - `INVALID`：关键文件、符号、职责边界或执行流程变化较大，必须重新理解代码。
 
-理想情况下，判断逻辑不只看 `git diff`，还可以接入 GitNexus、Graphify、静态 import 图、语言服务器等代码智能工具。
+理想情况下，判断逻辑不只看 `git diff`，还可以接入代码图、代码智能、静态 import 图、语言服务器等工具。
 
 ## 受管理区块
 
@@ -183,7 +183,7 @@ skills/agents-tree/
 - `STALE_WARNING`：相关内容变过，知识可能需要局部更新。
 - `INVALID`：不能继续信这份知识，必须重新检查代码。
 
-Agent 可以用 Git diff、GitNexus、Graphify、语言服务器或直接读代码来完成复查。关键不在工具，而在于不能默默信任过期知识。
+Agent 可以用 Git diff、代码图工具、代码智能工具、语言服务器或直接读代码来完成复查。关键不在工具，而在于不能默默信任过期知识。
 
 ## 刷新流程
 
@@ -240,6 +240,20 @@ agents_tree_skip: []
 
 不是每次代码修改都要更新知识树。普通实现细节改动如果没有改变稳定的项目理解，就应该保持知识树不变。
 
+## 跨模块串联
+
+每个 `AGENTS.md` 都应该保持对自身目录的内聚描述，不应该试图保存完整的跨模块依赖图。
+
+当任务涉及关键符号、API、数据结构、调用流程或职责边界时，Agent 应该用代码图或代码智能工具找到当前真实的调用方、被调方、引用和影响面。如果结果指向另一个模块，Agent 应该继续读取那个模块最近的 `AGENTS.md`，再跨边界修改。
+
+简化成一句话：
+
+```text
+AGENTS.md 负责启动本地推理。
+代码图工具负责揭示当前跨模块影响面。
+下一个 AGENTS.md 负责提供被影响模块的本地上下文。
+```
+
 ## 推荐的 `AGENTS.md` 结构
 
 生成文件应该短、清晰、稳定：
@@ -281,6 +295,17 @@ Agents Tree 可以和 repo map、Agent memory、代码图工具一起工作。
 - Agents Tree 给 Agent 提供可验证、目录级的项目知识入口。
 
 它不需要替代这些系统。更好的定位是：提供一个可复用的 Agent skill，让 Agent 能在任意目标项目里维护简单、可审查、可被继续读取的 `AGENTS.md` 知识树。
+
+常见配套工具包括：
+
+- [GitNexus](https://github.com/nxpatterns/gitnexus)：面向 Agent 的代码智能和知识图谱。
+- [Graphify](https://github.com/safishamsi/graphify)：面向代码和项目材料的可查询知识图谱。
+- [Sourcebot](https://github.com/sourcebot-dev/sourcebot)：自托管代码搜索和导航。
+- [CodeQL](https://github.com/github/codeql)：语义代码分析和查询引擎。
+- [ast-grep](https://github.com/ast-grep/ast-grep)：基于 AST 的结构化搜索和改写。
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter)：很多代码智能工具使用的解析基础设施。
+- [Repomix](https://github.com/yamadashy/repomix)：面向 AI 的仓库打包工具。
+- [Gitingest](https://github.com/coderamp-labs/gitingest)：面向 prompt 的仓库提取工具。
 
 ## License
 

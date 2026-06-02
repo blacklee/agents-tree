@@ -18,7 +18,7 @@ Large repositories make coding agents repeatedly pay for the same work:
 - deciding whether old documentation is still trustworthy
 - redoing architecture reasoning before each small change
 
-Tools such as code graphs, repo maps, and semantic search reduce the cost of reading code. Agents Tree focuses on a different cost: repeated reasoning.
+Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated reasoning.
 
 It does that by guiding an agent to maintain a tree of `AGENTS.md` files across the target repository. Root files stay short and act like indexes. Lower-level files become more specific as they get closer to the code they describe.
 
@@ -89,7 +89,7 @@ Agents Tree classifies knowledge into three states:
 - `STALE_WARNING`: relevant evidence changed, but the module shape appears mostly intact
 - `INVALID`: critical files, symbols, ownership boundaries, or execution flows changed enough that the agent must rescan the code
 
-The exact classifier should combine Git diffs with optional code-intelligence providers such as GitNexus, Graphify, static import graphs, or language-server data.
+The exact classifier should combine Git diffs with optional code graph, code-intelligence, static import graph, or language-server data.
 
 ## Managed Sections
 
@@ -165,7 +165,7 @@ The reviewer reads metadata, compares the recorded evidence against the current 
 - `STALE_WARNING`: something changed and the knowledge may need a partial update.
 - `INVALID`: the knowledge must not be trusted until the code is inspected again.
 
-An agent may use Git diffs, GitNexus, Graphify, language-server data, or direct code reads to perform this review. The important part is not the tool; it is that stale knowledge is not silently trusted.
+An agent may use Git diffs, code graph tools, code-intelligence tools, language-server data, or direct code reads to perform this review. The important part is not the tool; it is that stale knowledge is not silently trusted.
 
 ## Refresh Workflow
 
@@ -222,6 +222,20 @@ Agents should consider updating the tree when a change affects stable knowledge 
 
 Not every code change should update the tree. Small implementation edits should leave it untouched unless they change durable project understanding.
 
+## Cross-Module Handoff
+
+Each `AGENTS.md` should stay cohesive to its own directory. It should not try to store a complete dependency map.
+
+When a task touches critical symbols, APIs, data shapes, call flows, or ownership boundaries, the agent should use a code graph or code-intelligence tool to find current callers, callees, references, and impact. If that points to another module, the agent should read that module's nearest `AGENTS.md` before editing across the boundary.
+
+In short:
+
+```text
+AGENTS.md starts local reasoning.
+Code graph tools reveal current cross-module impact.
+The next AGENTS.md provides local context for the impacted module.
+```
+
 ## Recommended `AGENTS.md` Shape
 
 Generated files should stay short and structured:
@@ -263,6 +277,17 @@ Agents Tree can work alongside repo-map and memory tools.
 - Agents Tree routes agents through verified, directory-scoped project knowledge.
 
 The intended role is not to replace those systems, but to give agents a reusable skill for maintaining a simple, reviewable `AGENTS.md` knowledge tree inside any project.
+
+Common companion tools include:
+
+- [GitNexus](https://github.com/nxpatterns/gitnexus): code intelligence and knowledge graph for agents.
+- [Graphify](https://github.com/safishamsi/graphify): queryable knowledge graph for code and project materials.
+- [Sourcebot](https://github.com/sourcebot-dev/sourcebot): self-hosted code search and navigation.
+- [CodeQL](https://github.com/github/codeql): semantic code analysis and query engine.
+- [ast-grep](https://github.com/ast-grep/ast-grep): AST-based structural search and rewrite.
+- [Tree-sitter](https://github.com/tree-sitter/tree-sitter): parser foundation used by many code-intelligence tools.
+- [Repomix](https://github.com/yamadashy/repomix): AI-friendly repository packing.
+- [Gitingest](https://github.com/coderamp-labs/gitingest): prompt-friendly repository extraction.
 
 ## License
 

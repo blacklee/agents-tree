@@ -36,6 +36,20 @@ Do not update the tree for every code change. Small implementation edits that do
 - Leaf files may describe stable implementation details.
 - Child files must not repeat parent guidance.
 - Lower files may override parent rules only when the override is explicit and local.
+- Each `AGENTS.md` should be cohesive to its directory and should not store a full cross-module dependency map.
+
+## Cross-Module Handoff
+
+Use `AGENTS.md` to tell agents when cross-module reasoning is needed, not to store every relationship.
+
+When work crosses a module boundary:
+
+1. Start from the current module's nearest `AGENTS.md`.
+2. Use a code graph, code-intelligence, structural search, or language-aware navigation tool to find current callers, callees, references, and impact.
+3. Read the nearest `AGENTS.md` for any impacted module before editing across that boundary.
+4. Update `AGENTS.md` only when the cross-module rule is durable, such as "inspect downstream consumers before changing this response shape."
+
+Do not write lists of current callers, imports, or references into `AGENTS.md` unless they are intentionally stable architectural contracts.
 
 ## Evidence Collection
 
@@ -43,7 +57,7 @@ Prefer the cheapest reliable evidence:
 
 1. existing `AGENTS.md` files
 2. project ignore files such as `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, and tool-specific ignore files
-3. code-intelligence tools such as GitNexus or Graphify
+3. code graph, code-intelligence, structural search, or language-aware navigation tools
 4. focused source reads
 5. relevant tests or verification commands
 6. Git diffs and recent history
