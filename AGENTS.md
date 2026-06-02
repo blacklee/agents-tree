@@ -61,6 +61,8 @@ critical_files: []
 critical_symbols: []
 confidence: medium
 owner: ai-generated
+agents_tree_keep: []
+agents_tree_skip: []
 ```
 
 Generated content must be placed inside:
@@ -78,6 +80,23 @@ Human-maintained content must be placed inside:
 ```
 
 Refresh logic must preserve human sections unless it detects a direct contradiction. In that case, report the conflict and require human review instead of overwriting the section.
+
+Conflicts must be recorded with:
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+# Unresolved Agents Tree Conflict
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+<!-- agents-tree:conflict:end -->
+```
+
+An unresolved conflict blocks maintenance of that `AGENTS.md` file and its subtree, not unrelated code work or unrelated tree nodes.
+
+Conflict blocks must remain understandable to humans and agents that have not installed this skill.
 
 ## Knowledge Rules
 

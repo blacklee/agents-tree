@@ -41,7 +41,7 @@ Do not update the tree for every code change. Update it only when the change aff
 4. Decide whether the target directory needs an `AGENTS.md`; do not create files just because a directory exists.
 5. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
 6. Update only managed generated sections unless the user explicitly asks to edit human sections.
-7. If generated knowledge contradicts a human section, stop and report the conflict instead of overwriting it.
+7. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
 8. Summarize touched files, evidence reviewed, freshness status, and unresolved conflicts.
 
 ## File Contract
@@ -69,6 +69,21 @@ Managed sections:
 <!-- agents-tree:human:start -->
 <!-- agents-tree:human:end -->
 ```
+
+Unresolved conflict blocks:
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+# Unresolved Agents Tree Conflict
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+<!-- agents-tree:conflict:end -->
+```
+
+If an unresolved conflict block exists, do not refresh that `AGENTS.md` file or its subtree unless the user explicitly asks to resolve the conflict.
 
 Generated claims must be traceable to files, symbols, imports, execution flows, tests, or explicit human notes.
 

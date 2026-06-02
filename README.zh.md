@@ -195,6 +195,38 @@ Agent 可以用 Git diff、GitNexus、Graphify、语言服务器或直接读代�
 - 复查完成后推进 `last_verified_commit`
 - 明确指出需要人类判断的冲突
 
+## 冲突区块
+
+如果自动生成知识和人工维护段落冲突，Agent 不应该覆盖任何一方，而应该把冲突写进文件：
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+# Unresolved Agents Tree Conflict / 未解决的知识树冲突
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+<!-- agents-tree:conflict:end -->
+```
+
+未解决冲突会阻止这个 `AGENTS.md` 文件及其子树继续被维护，但不阻止无关代码工作，也不阻止维护无关的知识树节点。
+
+marker 是给工具识别的，但区块正文必须让没有安装 Agents Tree 的人类和普通 Agent 也能看懂。
+
+## Keep 和 Skip
+
+Agents Tree 应该先尊重项目已有的忽略文件，例如 `.gitignore`、`.ignore`、`.agentignore`、`.cursorignore` 和各类工具自己的 ignore 文件。
+
+`AGENTS.md` 里只允许非常少量的本地配置：
+
+```yaml
+agents_tree_keep: []
+agents_tree_skip: []
+```
+
+`agents_tree_skip` 用于额外跳过少量路径。`agents_tree_keep` 用于少数即使被宽泛 ignore 规则覆盖、也必须保留可见的路径。
+
 ## 更新触发时机
 
 当一次改动影响未来 Agent 需要依赖的稳定知识时，Agent 才应该考虑更新知识树：

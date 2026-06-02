@@ -21,6 +21,8 @@ critical_symbols:
   - ExampleService
 confidence: medium
 owner: ai-generated
+agents_tree_keep: []
+agents_tree_skip: []
 ---
 ```
 
@@ -33,6 +35,10 @@ owner: ai-generated
 - `critical_symbols`: functions, classes, types, modules, routes, jobs, or flows whose changes may invalidate this knowledge.
 - `confidence`: `high`, `medium`, or `low`.
 - `owner`: usually `ai-generated`; use `human-maintained` only when the whole file is intentionally human-owned.
+- `agents_tree_keep`: short optional glob list for paths that should be considered even if ignore files would normally exclude them.
+- `agents_tree_skip`: short optional glob list for extra paths to skip after applying project ignore files.
+
+Keep `agents_tree_keep` and `agents_tree_skip` very small. Prefer existing `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, or tool-specific ignore files for normal exclusions.
 
 ## Managed Sections
 
@@ -54,7 +60,51 @@ Human-maintained content must live inside:
 
 Agents may update generated sections after reviewing evidence. Agents must not rewrite human sections unless the user explicitly asks.
 
-If generated knowledge conflicts with human text, report the conflict and ask for judgment.
+## Conflict Sections
+
+If generated knowledge conflicts with human text, record the conflict in the file instead of overwriting either side:
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+detected_at_commit: abc123
+detected_by: agent
+conflict_type: human_generated_mismatch
+related_files:
+  - src/example.ts
+
+# Unresolved Agents Tree Conflict
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+
+Human action required:
+
+- review the human-maintained section
+- review the generated section
+- update one or both sides
+- remove this conflict block, or mark it resolved with a short note
+
+## Human Claim
+
+Summarize the human-maintained claim.
+
+## Code Evidence
+
+Summarize the current code evidence.
+
+## Required Resolution
+
+Ask a human to update the human section, update the generated section, or explain why both can coexist.
+<!-- agents-tree:conflict:end -->
+```
+
+An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
+
+After a human resolves the conflict, remove the conflict block or change `status` to `resolved` with a short resolution note.
+
+Conflict blocks must be self-explanatory. Humans and agents that have not installed Agents Tree should still understand that the local `AGENTS.md` guidance is not authoritative until the conflict is resolved.
 
 ## Recommended Sections
 

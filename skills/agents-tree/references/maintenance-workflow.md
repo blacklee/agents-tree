@@ -42,12 +42,15 @@ Do not update the tree for every code change. Small implementation edits that do
 Prefer the cheapest reliable evidence:
 
 1. existing `AGENTS.md` files
-2. code-intelligence tools such as GitNexus or Graphify
-3. focused source reads
-4. relevant tests or verification commands
-5. Git diffs and recent history
+2. project ignore files such as `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, and tool-specific ignore files
+3. code-intelligence tools such as GitNexus or Graphify
+4. focused source reads
+5. relevant tests or verification commands
+6. Git diffs and recent history
 
 Avoid broad source scans unless the existing knowledge is missing or invalid.
+
+Use ignore files before applying `agents_tree_skip`. Use `agents_tree_keep` only for a small number of paths that must remain visible despite broad ignore patterns.
 
 ## Refresh Discipline
 
@@ -56,6 +59,7 @@ When refreshing:
 - verify current code evidence first
 - edit only the generated section
 - preserve human sections byte-for-byte unless the user asks otherwise
+- write or preserve conflict blocks when human and generated knowledge disagree
 - update metadata only after the generated claims have been checked
 - list any unresolved conflicts in the final response
 
@@ -70,4 +74,19 @@ Treat these as conflicts:
 - a critical file or symbol disappeared
 - parent and child `AGENTS.md` files give incompatible instructions
 
-Do not resolve conflicts silently. Report the exact file and the competing claims.
+Do not resolve conflicts silently. Record the exact file, competing claims, and code evidence in an `agents-tree:conflict` block.
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+# Unresolved Agents Tree Conflict
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+<!-- agents-tree:conflict:end -->
+```
+
+If a file already has an unresolved conflict block, do not refresh that file or any child `AGENTS.md` under its directory. Continue with unrelated files when they do not depend on the conflicted subtree.
+
+Write conflict blocks so they are understandable without this skill installed. The marker is for tools; the visible Markdown body is for humans and ordinary agents.

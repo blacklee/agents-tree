@@ -6,6 +6,8 @@ critical_files: []
 critical_symbols: []
 confidence: low
 owner: ai-generated
+agents_tree_keep: []
+agents_tree_skip: []
 ---
 
 # Implementation Notes

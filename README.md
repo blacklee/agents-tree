@@ -177,6 +177,38 @@ When knowledge needs an update:
 - advance `last_verified_commit` when the review is complete
 - mention any conflicts that need human judgment
 
+## Conflict Blocks
+
+If generated knowledge conflicts with a human-maintained section, the agent should record the conflict in the file instead of overwriting either side:
+
+```md
+<!-- agents-tree:conflict:start -->
+status: unresolved
+# Unresolved Agents Tree Conflict
+
+This `AGENTS.md` file contains unresolved project-knowledge conflict.
+
+Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
+<!-- agents-tree:conflict:end -->
+```
+
+An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
+
+The marker is machine-readable, but the body must also be clear to humans and agents that have not installed Agents Tree.
+
+## Keep And Skip
+
+Agents Tree should first respect existing ignore files such as `.gitignore`, `.ignore`, `.agentignore`, `.cursorignore`, and tool-specific ignore files.
+
+`AGENTS.md` may add only a very small amount of local configuration:
+
+```yaml
+agents_tree_keep: []
+agents_tree_skip: []
+```
+
+Use `agents_tree_skip` for extra paths to ignore, and `agents_tree_keep` for rare paths that must remain visible despite broad ignore patterns.
+
 ## Update Triggers
 
 Agents should consider updating the tree when a change affects stable knowledge future agents need:
