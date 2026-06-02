@@ -71,9 +71,12 @@ Before editing, parse section markers:
 - exactly one generated section is required for refresh
 - at most one human section is allowed
 - starts and ends must be paired, ordered, and not nested
-- malformed markers make the file `INVALID`
+- malformed markers make the file `INVALID` for refresh
+- text outside managed sections is human-maintained and must be preserved byte-for-byte
 
 If an existing `AGENTS.md` lacks managed markers, treat all existing body text as human-maintained by default. Preserve it byte-for-byte unless the user explicitly asks to normalize it.
+
+During initial tree creation, adding a generated section to an existing unmarked `AGENTS.md` is allowed only if the existing body remains byte-for-byte intact. Wrapping, reordering, trimming, or rewriting that body is normalization and requires explicit user approval.
 
 ## Knowledge Status
 
@@ -203,8 +206,8 @@ Use code-intelligence tools when available. If they are unavailable, use focused
 
 Decision checklist:
 
-- Missing or malformed metadata or managed markers: `INVALID`.
-- Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until the new evidence is verified.
+- Missing or malformed metadata or managed markers in a managed file: `INVALID`.
+- Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until the new evidence is verified. Keep the old metadata while investigating; do not delete missing evidence entries merely to make the file pass freshness review.
 - Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
 - Changed critical file with stable responsibility and key flows after focused review: `STALE_WARNING`.
 - No relevant recorded evidence or current references/flows changed: `VALID`.

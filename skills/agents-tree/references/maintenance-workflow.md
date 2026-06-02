@@ -78,6 +78,34 @@ If code graph or code-intelligence tools are unavailable, use this bounded seque
 
 Stop when there is enough evidence to classify freshness, or report that validity cannot be established.
 
+## Unmarked `AGENTS.md` Migration
+
+When creating an Agents Tree in a directory that already has an unmarked `AGENTS.md`:
+
+1. Treat the existing body as human-maintained.
+2. Preserve the existing body byte-for-byte, including headings, comments, whitespace, and ordering.
+3. Add metadata as front matter only if needed for the managed generated section.
+4. Place generated content in managed sections without wrapping, reordering, trimming, or rewriting the existing body.
+5. Report that the file now contains preserved human text outside managed sections.
+
+Do not wrap existing text in `agents-tree:human` markers unless the user explicitly asks to normalize the file. Normalization is a human-reviewed formatting step, not part of default creation or refresh.
+
+On later refreshes, continue preserving unmanaged text outside managed sections as human-maintained content.
+
+## Missing Critical Evidence
+
+If a recorded `critical_files` path or `critical_symbols` entry cannot be found:
+
+1. Classify the `AGENTS.md` as `INVALID`.
+2. Keep the old metadata while investigating; do not delete or replace missing entries first.
+3. Check whether the evidence was deleted, renamed, moved across module boundaries, or replaced by a new flow.
+4. Use code graph or code-intelligence evidence when available; otherwise use Git history and focused references for the recorded path or symbol.
+5. Update metadata only after the generated claims are re-evidenced against the new location or replacement flow.
+
+If the missing evidence reflects a module split, merge, rename, or ownership move, handle it as a scope move before refreshing generated content.
+
+If the replacement cannot be established, preserve or write a conflict block with `conflict_type: missing_critical_evidence` and leave the stale evidence visible for human review.
+
 ## Refresh Discipline
 
 When refreshing:

@@ -57,8 +57,10 @@ Do not update the tree for every code change. Update it only when the change aff
 ## Section Safety
 
 - If an existing `AGENTS.md` has no managed markers, treat all existing body text as human-maintained. Preserve it unless the user explicitly asks to normalize it.
+- During initial tree creation, unmarked existing body text may stay outside managed sections; preserve it byte-for-byte and add generated content in managed sections only.
 - Require exactly one well-ordered generated section before refresh. Allow at most one well-ordered human section.
-- Missing, duplicated, nested, or out-of-order markers make the file `INVALID`; do not edit generated content until repaired or explicitly normalized.
+- In refresh mode, missing, duplicated, nested, or out-of-order markers make the file `INVALID`; do not edit generated content until repaired or explicitly normalized.
+- Preserve unmanaged text outside managed sections as human-maintained content.
 - `owner: human-maintained` blocks all edits to the file unless the user explicitly asks to edit that human-owned file.
 - Before refreshing a child `AGENTS.md`, check applicable ancestors for unresolved conflict blocks that cover the target path.
 
@@ -132,8 +134,8 @@ Treat stale or invalid knowledge as worse than missing knowledge.
 
 Decision checklist:
 
-- Missing or malformed metadata or markers: `INVALID`.
-- Deleted, renamed, or missing critical file or symbol: `INVALID` until re-evidenced.
+- Missing or malformed metadata or markers in a managed file: `INVALID`.
+- Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until re-evidenced; do not remove old metadata until the replacement evidence and scope are verified.
 - Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
 - Changed critical file with the same responsibility and key flows after focused review: `STALE_WARNING`.
 - No relevant recorded evidence or current references/flows changed: `VALID`.
