@@ -177,6 +177,19 @@ When knowledge needs an update:
 - advance `last_verified_commit` when the review is complete
 - mention any conflicts that need human judgment
 
+## Update Triggers
+
+Agents should consider updating the tree when a change affects stable knowledge future agents need:
+
+- files or symbols recorded in `critical_files` or `critical_symbols` changed
+- module responsibility, entry points, call flows, ownership boundaries, or verification steps changed
+- important module directories were added, removed, renamed, or moved
+- existing `AGENTS.md` guidance conflicts with current code evidence
+- agents repeatedly scan the same directory because useful local guidance is missing
+- the user explicitly asks to update, refresh, or record project knowledge
+
+Not every code change should update the tree. Small implementation edits should leave it untouched unless they change durable project understanding.
+
 ## Recommended `AGENTS.md` Shape
 
 Generated files should stay short and structured:

@@ -15,6 +15,20 @@ Good candidates:
 
 Do not add an `AGENTS.md` for tiny directories with obvious responsibilities.
 
+## When To Update Existing Knowledge
+
+Consider updating an existing `AGENTS.md` when current work changes stable knowledge future agents need:
+
+- a changed file appears in `critical_files`
+- a changed symbol appears in `critical_symbols`
+- a module responsibility, boundary, entry point, call flow, or verification path changed
+- an important directory was added, removed, renamed, or moved
+- the agent found a mismatch between existing guidance and current code evidence
+- the agent repeatedly had to scan the same directory because local guidance was missing
+- the user explicitly asked to update, refresh, or record knowledge
+
+Do not update the tree for every code change. Small implementation edits that do not change durable project understanding should leave the knowledge tree untouched.
+
 ## Tree Shape
 
 - Root files act as indexes and route agents.

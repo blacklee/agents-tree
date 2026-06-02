@@ -20,6 +20,19 @@ This skill is only the maintenance workflow. The knowledge tree belongs to the t
 
 If the user only asks to check, inspect, analyze, or review, do not edit files unless they explicitly approve edits.
 
+## Update Triggers
+
+Consider updating the tree when work changes stable knowledge that future agents need:
+
+- edited files or symbols listed in `critical_files` or `critical_symbols`
+- changed directory responsibility, entry points, call flows, ownership boundaries, or verification steps
+- added, removed, renamed, or moved an important module directory
+- discovered an existing `AGENTS.md` claim that conflicts with current code evidence
+- repeatedly scanned the same directory because useful local guidance was missing
+- user explicitly asked to update, refresh, or record project knowledge
+
+Do not update the tree for every code change. Update it only when the change affects durable guidance future agents should rely on.
+
 ## Workflow
 
 1. Identify the target project and requested mode.
