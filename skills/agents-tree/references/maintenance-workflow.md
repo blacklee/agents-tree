@@ -51,6 +51,8 @@ Do not update the tree for every code change. Small implementation edits that do
 
 Generated content should work as a decision map, not an encyclopedia. It should help future agents choose what to read or query next, what not to read first, and which checks prove a change. Do not duplicate a full API index, method inventory, current caller list, consumer list, or live dependency graph.
 
+Every generated bullet must pass the next-action test: would this bullet change what the next agent reads, queries, cross-checks, skips, or verifies? If not, delete it.
+
 For flat directories with many large files, create one route-oriented `AGENTS.md` first. Do not create file-level `AGENTS.md` files unless the code is reorganized into real subdirectories. If the directory remains too broad for useful local guidance, recommend code-structure refactoring separately from knowledge-tree maintenance.
 
 ## Cross-Module Handoff
@@ -71,8 +73,8 @@ Do not write lists of current callers, imports, references, or consumers into `A
 Prefer decision-compression sections over module-summary sections:
 
 - `Use This File When`: task shapes where this file should be read before broad source inspection.
-- `Skip This File When`: task shapes where another file, subtree, or code graph query should come first.
 - `First Hop Rules`: stable rules of the form "if task is X, start with Y."
+- `Skip This File When`: concrete task shapes where another file, subtree, or code graph query should come first.
 - `Cross-Module Checks`: stable boundary checks and the code-intelligence targets to inspect before editing across them.
 - `Verification Hints`: focused tests, commands, or review steps that usually prove this area.
 - `Evidence Notes`: concise evidence types behind the generated claims.
@@ -80,6 +82,8 @@ Prefer decision-compression sections over module-summary sections:
 Keep scope context short. A one-line ownership snapshot is useful when it explains why the routing rules apply, but directory responsibilities should not dominate the generated section.
 
 Allow negative guidance when it saves reasoning tokens, such as "do not start from `__init__.py` for permission bugs" or "transport-only changes usually do not require reading the full services subtree." Negative guidance must be evidence-backed and scoped to stable task shapes.
+
+`Skip This File When` is required to be specific when present. Do not write vague bullets such as "skip this when the target is already clear" or "skip for unrelated changes." Use the form "If the task is only X, do not read this file first; go to Y or query Z."
 
 ## Evidence Collection
 
@@ -181,7 +185,8 @@ After refresh, verify:
 When reviewing an `AGENTS.md`, assess whether it reduces future decision cost:
 
 - Does it route agents to the right first file, symbol, flow, or code-intelligence query?
-- Does it say when the file should be skipped?
+- Does it say concretely when the file should be skipped and where to go instead?
+- Does every generated bullet change the next action?
 - Does it prevent repeated discovery of stable boundaries?
 - Does it avoid duplicating searchable details, current caller lists, or dependency inventories?
 - Are critical files and symbols precise enough for freshness checks?

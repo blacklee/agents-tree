@@ -20,7 +20,7 @@ agents_tree_skip: []
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Include implementation details only when they reduce stable task decisions. -->
+<!-- Delete unused generated headings before committing this file. Include implementation details only when they reduce stable task decisions. Delete any bullet that does not change the next action. -->
 
 ## Decision Compression
 
@@ -34,8 +34,8 @@ agents_tree_skip: []
 
 ## Skip This File When
 
-- Skip this when the task only changes a caller, wrapper, or transport layer outside this leaf.
-- Skip this when the target symbol is already known and local guidance would not change the edit path.
+- If the task only changes caller, wrapper, or transport behavior outside this leaf, do not read this file first; go to `path/to/caller-or-wrapper`.
+- If the task only edits `KnownSymbol` internals, do not reread this guide; inspect `path/to/known/file` and focused tests.
 
 ## First Hop Rules
 

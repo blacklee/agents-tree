@@ -127,6 +127,10 @@ Do not use generated sections as module summaries. Keep directory scope context 
 
 Negative guidance is allowed when it saves reasoning tokens, such as naming files or subtrees that should not be read first for a stable task shape. Do not add negative guidance as a broad prohibition; it must be scoped and evidence-backed.
 
+Every generated bullet must change the next action for a future agent: what to read, what to query, what boundary to check, what to skip, or how to choose verification. Delete bullets that merely describe the directory without changing an action.
+
+`Skip This File When` bullets must be concrete. Do not write vague bullets such as "skip when the target is clear." Use the shape: "If the task is only X, do not read this file first; go to Y or query Z."
+
 ## Evidence Notes
 
 Generated claims should be easy to verify without rereading broad code areas.
@@ -230,6 +234,8 @@ Root and module files should use a small subset of:
 ```
 
 Only include sections that contain useful information. Empty headings waste context.
+
+Delete any generated bullet that does not change the next action.
 
 ## Freshness Review
 

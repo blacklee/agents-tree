@@ -276,6 +276,8 @@ Root-level files should behave like indexes. Leaf-level files may include implem
 - Prefer trustworthy short context over exhaustive documentation.
 - Keep root knowledge abstract and leaf knowledge concrete.
 - Prefer task-routing and first-hop rules over directory summaries.
+- Keep only generated bullets that change the next action.
+- Make skip guidance concrete: if the task is only X, go to Y or query Z instead.
 - Do not duplicate parent knowledge in child files.
 - Record evidence for every generated claim.
 - Treat stale knowledge as worse than missing knowledge.

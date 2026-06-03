@@ -116,6 +116,8 @@ Conflict blocks should use relative Markdown links for known files and related `
 - Leaf files may include implementation details only when they are stable enough to be useful.
 - Generated content should prioritize decision compression over directory summaries.
 - Generated sections should say when to use the file, when to skip it, where to start, and which code-intelligence target or verification path matters.
+- Every generated bullet should change the next action; delete bullets that only describe the directory.
+- `Skip This File When` guidance should be concrete: if the task is only X, do not read this first; go to Y or query Z.
 - Every generated claim should be traceable to files, symbols, imports, execution flows, or explicit human notes.
 - Stale knowledge should be surfaced clearly instead of silently trusted.
 - `last_verified_commit` should advance only after all recorded critical evidence and relevant current diffs or graph evidence have been checked.

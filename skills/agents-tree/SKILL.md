@@ -27,6 +27,10 @@ Use code graph, code-intelligence, structural search, or language-aware navigati
 
 Before creating a child `AGENTS.md`, state the specific decision cost it saves. If the answer is vague, do not create the file.
 
+Every generated bullet must change the next action for a future agent: what to read, what to query, what boundary to check, what to skip, or how to choose verification. If a bullet does not change the next action, delete it.
+
+`Skip This File When` must be concrete. Do not write vague skip rules such as "skip when the target is clear." Prefer "If the task is only X, do not read this file first; go to Y or query Z."
+
 ## Operating Modes
 
 - **Create**: add a minimal `AGENTS.md` tree where directory-level guidance will reduce future decision branches.
@@ -66,7 +70,7 @@ Do not update the tree for every code change. Update it only when the change aff
 5. If applicable project guidance declares a code graph or code-intelligence tool, **MUST** use it before creating, reviewing, or refreshing generated knowledge; use `grep`/`rg` only as supplementary evidence.
 6. Decide whether the target directory needs an `AGENTS.md`; state the decision-compression reason before creating a child file.
 7. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
-8. Write generated sections as routing rules: when to use this file, when to skip it, first-hop rules, cross-module checks, and verification hints.
+8. Write generated sections as routing rules: concrete skip rules, first-hop rules, cross-module checks, and verification-choice hints.
 9. Update only managed generated sections unless the user explicitly asks to edit human sections.
 10. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
 11. Summarize touched files, evidence reviewed, freshness status, decision cost saved, and unresolved conflicts.

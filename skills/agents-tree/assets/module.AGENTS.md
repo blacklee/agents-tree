@@ -20,7 +20,7 @@ agents_tree_skip: []
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Keep only stable local decision guidance. -->
+<!-- Delete unused generated headings before committing this file. Keep only stable local decision guidance. Delete any bullet that does not change the next action. -->
 
 ## Decision Compression
 
@@ -34,8 +34,8 @@ agents_tree_skip: []
 
 ## Skip This File When
 
-- Skip this when the target symbol is already known and the change is implementation-only inside that symbol.
-- Skip this when `TASK_SHAPE` belongs to `neighboring/module` instead of this subtree.
+- If the task only changes implementation inside `KnownSymbol`, do not read this file first; inspect `path/to/known/file`.
+- If the task is `NEIGHBOR_TASK_SHAPE`, do not start in this subtree; read `neighboring/module/AGENTS.md`.
 
 ## First Hop Rules
 

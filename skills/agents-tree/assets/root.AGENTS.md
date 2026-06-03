@@ -20,7 +20,7 @@ agents_tree_skip: []
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Root files should route agents, not summarize the project. -->
+<!-- Delete unused generated headings before committing this file. Root files should route agents, not summarize the project. Delete any bullet that does not change the next action. -->
 
 ## Decision Compression
 
@@ -34,8 +34,8 @@ agents_tree_skip: []
 
 ## Skip This File When
 
-- Skip this when the target file or symbol is already known and a nearer `AGENTS.md` applies.
-- Skip this for implementation-only edits that stay inside an already-known leaf module.
+- If the task only changes `KNOWN_LEAF_SYMBOL`, do not read this file first; read `path/to/leaf/AGENTS.md`.
+- If the task is only `LOCAL_IMPLEMENTATION_EDIT`, do not start from the root; go directly to `path/to/known/file`.
 
 ## First Hop Rules
 
