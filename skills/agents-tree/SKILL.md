@@ -47,8 +47,8 @@ Do not update the tree for every code change. Update it only when the change aff
 2. Read the nearest applicable `AGENTS.md` files first.
 3. Validate ownership and section markers before editing.
 4. Stop knowledge-tree maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
-5. Use available code graph, code-intelligence, Git diff, language, or focused source-read tools to gather only the needed evidence.
-6. Decide whether the target directory needs an `AGENTS.md`; do not create files just because a directory exists.
+5. If applicable project guidance declares a code graph or code-intelligence tool, **MUST** use it before creating, reviewing, or refreshing generated knowledge; use `grep`/`rg` only as supplementary evidence.
+6. Decide whether the target directory needs an `AGENTS.md`; state the token-saving reason before creating a child file.
 7. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
 8. Update only managed generated sections unless the user explicitly asks to edit human sections.
 9. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
@@ -122,7 +122,13 @@ Conflict blocks are an exception to normal module cohesion. Include the smallest
 
 Generated claims must be traceable to files, symbols, imports, execution flows, tests, or explicit human notes.
 
-Use short `Evidence Notes` for generated files with multiple claims; do not write live dependency lists.
+Before writing `critical_symbols`, verify each entry resolves to a real code symbol using declared code-intelligence tools or focused source evidence. Do not store route names, aliases, approximate labels, or task notes in metadata.
+
+`critical_symbols` is not a function inventory. Include only durable entry points, boundary symbols, or symbols whose change would invalidate local guidance. Prefer about 8-15 symbols for a medium module unless there is a strong reason.
+
+Use short `Evidence Notes` for generated files with multiple claims; name the evidence type used. Do not write live dependency lists.
+
+Generated content should help future agents choose what to read next. Do not duplicate a full API index, method inventory, or dependency graph that search or code-intelligence tools can produce.
 
 ## Freshness Labels
 
@@ -142,6 +148,10 @@ Decision checklist:
 - Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
 
 Advance `last_verified_commit` only after checking every recorded critical file and symbol plus current diffs or graph evidence affecting generated claims.
+
+After refresh, verify metadata consistency: every `critical_files` path exists, every `critical_symbols` entry resolves, generated claims fit the local scope, parent claims do not contradict this file, and `last_verified_commit` belongs to the target repository containing this `AGENTS.md`.
+
+In Review mode, include a token-saving value rating: `HIGH`, `MEDIUM`, or `LOW`.
 
 ## Templates And Details
 

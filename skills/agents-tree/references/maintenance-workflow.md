@@ -13,6 +13,16 @@ Good candidates:
 - directory has compatibility rules or non-obvious design constraints
 - agents repeatedly inspect the directory during normal work
 
+Before creating a child `AGENTS.md`, state the token-saving reason:
+
+- repeated scans avoided
+- high-complexity directory
+- stable ownership boundary
+- high-risk cross-module contract
+- durable verification or compatibility rule
+
+If none applies, do not create the file.
+
 Do not add an `AGENTS.md` for tiny directories with obvious responsibilities.
 
 ## When To Update Existing Knowledge
@@ -38,6 +48,10 @@ Do not update the tree for every code change. Small implementation edits that do
 - Lower files may override parent rules only when the override is explicit and local.
 - Each `AGENTS.md` should be cohesive to its directory and should not store a full cross-module dependency map.
 
+Generated content should work as an entry map, not an encyclopedia. It should help future agents choose what to read next and avoid repeating stable reasoning. Do not duplicate a full API index, method inventory, or live dependency graph.
+
+For flat directories with many large files, create one route-oriented `AGENTS.md` first. Do not create file-level `AGENTS.md` files unless the code is reorganized into real subdirectories. If the directory remains too broad for useful local guidance, recommend code-structure refactoring separately from knowledge-tree maintenance.
+
 ## Cross-Module Handoff
 
 Use `AGENTS.md` to tell agents when cross-module reasoning is needed, not to store every relationship.
@@ -59,10 +73,12 @@ Separate instruction reading from evidence discovery:
 2. Apply project ignore files before discovering candidate evidence files.
 3. Apply `agents_tree_skip` after project ignore files.
 4. Apply `agents_tree_keep` only for rare reviewed exceptions.
-5. Prefer code graph, code-intelligence, structural search, or language-aware navigation tools for cross-module impact.
+5. **MUST** use project-declared code graph or code-intelligence tools before creating, reviewing, or refreshing generated knowledge.
 6. Use focused source reads, relevant tests, Git diffs, and recent history only as needed.
 
 Avoid broad source scans unless the existing knowledge is missing or invalid.
+
+If project guidance or the nearest applicable `AGENTS.md` declares a code-intelligence tool, using it is mandatory for generated knowledge. Use `grep`, `rg`, and raw file reads only as supplementary evidence or when the declared tool is unavailable or stale.
 
 Use ignore files before applying `agents_tree_skip`. Use `agents_tree_keep` only for a small number of paths that must remain visible despite broad ignore patterns.
 
@@ -77,6 +93,20 @@ If code graph or code-intelligence tools are unavailable, use this bounded seque
 5. focused textual references for named symbols only
 
 Stop when there is enough evidence to classify freshness, or report that validity cannot be established.
+
+## Critical Metadata Selection
+
+Before writing or refreshing metadata:
+
+- verify every `critical_files` path exists in the target repository
+- verify every `critical_symbols` entry resolves to a real code symbol
+- exclude route names, aliases, approximate labels, and task notes unless they are actual symbol names
+- put non-symbol context in `Evidence Notes`, not metadata
+- keep `critical_symbols` focused on durable entry points, boundary functions, exported types, jobs, or flow entry symbols
+
+`critical_symbols` is not a complete function list. For a medium module, prefer about 8-15 high-value symbols unless a strong reason is recorded.
+
+In multi-repo workspaces, compute `last_verified_commit` from the repository containing the target `AGENTS.md`. If a graph index reports a parent or aggregate repository commit, mention it in `Evidence Notes` but do not use it as `last_verified_commit`.
 
 ## Unmarked `AGENTS.md` Migration
 
@@ -115,11 +145,32 @@ When refreshing:
 - preserve human sections byte-for-byte unless the user asks otherwise
 - write or preserve conflict blocks when human and generated knowledge disagree
 - update metadata only after the generated claims have been checked
+- run a metadata consistency check before reporting completion
 - list any unresolved conflicts in the final response
 
 If the user asks for a check-only pass, report findings without editing files.
 
 In check mode, stop after reporting freshness status, evidence reviewed, and recommended next action. Do not modify `AGENTS.md` or metadata unless the user explicitly requested refresh, update, or write.
+
+After refresh, verify:
+
+- every `critical_files` path exists
+- every `critical_symbols` entry resolves
+- generated claims still fit the module scope
+- parent `AGENTS.md` claims do not contradict this file
+- `last_verified_commit` matches the target repository, not an unrelated parent or aggregate repository
+
+## Review Mode
+
+When reviewing an `AGENTS.md`, assess whether it reduces future reasoning cost:
+
+- Does it route agents to fewer files?
+- Does it prevent repeated discovery of stable boundaries?
+- Does it avoid duplicating searchable details?
+- Are critical files and symbols precise enough for freshness checks?
+- Does it use declared code-intelligence evidence when that evidence is available?
+
+Return a concise token-saving value rating: `HIGH`, `MEDIUM`, or `LOW`.
 
 ## Conflict Handling
 

@@ -32,7 +32,7 @@ agents_tree_skip: []
 - `module`: human-readable module or directory name.
 - `last_verified_commit`: commit where the generated knowledge was last checked.
 - `critical_files`: files whose changes may invalidate this knowledge.
-- `critical_symbols`: functions, classes, types, modules, routes, jobs, or flows whose changes may invalidate this knowledge.
+- `critical_symbols`: real code symbols whose changes may invalidate this knowledge, such as functions, classes, types, exported modules, route handlers, jobs, or flow entry points.
 - `confidence`: `high`, `medium`, or `low`.
 - `owner`: usually `ai-generated`; use `human-maintained` only when the whole file is intentionally human-owned.
 - `agents_tree_keep`: short optional glob list for paths that should be considered even if ignore files would normally exclude them.
@@ -45,6 +45,10 @@ Keep `agents_tree_keep` and `agents_tree_skip` very small. Prefer existing `.git
 If `owner: human-maintained`, do not edit any part of the file unless the user explicitly asks to edit that human-owned file. Section markers do not override whole-file ownership.
 
 If no usable commit SHA exists, use `last_verified_commit: unknown`, set `confidence: low`, and do not classify the file as `VALID`.
+
+Before writing or refreshing `critical_symbols`, verify each entry resolves to a real code symbol using the project-declared code-intelligence tool or focused source evidence. Do not include route names, aliases, approximate labels, or task notes in metadata unless they are the actual symbol name. Put non-symbol notes in `Evidence Notes` instead.
+
+`critical_symbols` is not a full function list. It should contain only durable high-value entry points, shared boundary functions, or symbols whose change would invalidate local guidance. For a medium module, prefer about 8-15 symbols unless the module has a strong documented reason for more.
 
 ## Managed Sections
 
@@ -107,7 +111,11 @@ Use a short visible section when a file contains more than a few generated claim
 - Cross-module check: inspect current references before changing `ExampleService` response shape.
 ```
 
+Evidence notes should name the evidence type used, such as code graph query/context, source scan, tests, explicit human note, or commit diff. For generated claims involving flows, prefer code graph or process evidence when available.
+
 Keep evidence notes concise. Do not turn them into a citation table or live dependency list.
+
+Generated content should route future agents toward the right evidence. It should not duplicate a full API index, method inventory, or live dependency graph that search and code-intelligence tools can produce.
 
 ## Conflict Sections
 
@@ -214,3 +222,13 @@ Decision checklist:
 - Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
 
 Advance `last_verified_commit` only after checking every recorded critical file and symbol, plus current diffs or code-intelligence evidence that affects generated claims. Do not advance it when any recorded evidence cannot be checked.
+
+After refresh, run a metadata consistency check:
+
+- every `critical_files` path exists in the target repository
+- every `critical_symbols` entry resolves to a real code symbol
+- generated claims still fit this `AGENTS.md` directory scope
+- parent `AGENTS.md` claims do not contradict this file
+- `last_verified_commit` belongs to the target repository that contains this `AGENTS.md`
+
+In multi-repo workspaces, `last_verified_commit` must come from the repository containing the `AGENTS.md` file. If a code-intelligence index reports a parent, aggregate, or external repository commit, mention it in `Evidence Notes` but do not use it as `last_verified_commit`.

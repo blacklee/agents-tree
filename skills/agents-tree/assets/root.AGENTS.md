@@ -22,6 +22,11 @@ agents_tree_skip: []
 
 <!-- Delete unused generated headings before committing this file. Root files should stay index-like. -->
 
+## Evidence Notes
+
+- Evidence type: code graph/context, source scan, tests, commit diff, or explicit human note.
+- Symbol check: every `critical_symbols` entry resolves to a real code symbol.
+
 ## Overview
 
 Briefly describe the project purpose and the major source areas.
