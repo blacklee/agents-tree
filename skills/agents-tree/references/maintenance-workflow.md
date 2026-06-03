@@ -2,59 +2,60 @@
 
 ## When To Add `AGENTS.md`
 
-Add a file only when it will reduce future agent reasoning cost.
+Add a file only when it will reduce future agent decision cost.
 
-Good candidates:
+Good candidates are directories where generated guidance can reliably answer at least one decision the next agent would otherwise have to reason through:
 
-- directory has many files
-- directory has several child modules
-- directory owns an independent business or technical responsibility
-- directory contains high-risk or historically fragile code
-- directory has compatibility rules or non-obvious design constraints
-- agents repeatedly inspect the directory during normal work
+- which file, symbol, or flow to inspect first for a recurring task shape
+- which code graph or code-intelligence query target to use first
+- which boundary must be checked before changing an API, data shape, or ownership rule
+- which focused verification usually proves the local change
+- which nearby files or subtrees are tempting but usually irrelevant for a task shape
 
-Before creating a child `AGENTS.md`, state the token-saving reason:
+Directory size is only supporting evidence. A large directory without stable routing value should not get a child `AGENTS.md`. A small directory may deserve one when it repeatedly forces agents to choose between entry-layer, rule-layer, transport-layer, or verification-layer evidence.
 
-- repeated scans avoided
-- high-complexity directory
-- stable ownership boundary
-- high-risk cross-module contract
-- durable verification or compatibility rule
+Before creating a child `AGENTS.md`, state the decision-compression reason:
+
+- first-hop guidance avoided
+- code-intelligence target clarified
+- stable boundary check captured
+- irrelevant subtree or file skipped
+- durable verification or compatibility rule captured
 
 If none applies, do not create the file.
 
-Do not add an `AGENTS.md` for tiny directories with obvious responsibilities.
+Do not add an `AGENTS.md` for directories whose responsibilities and first-hop evidence are obvious from nearby names, tests, or existing parent guidance.
 
 ## When To Update Existing Knowledge
 
-Consider updating an existing `AGENTS.md` when current work changes stable knowledge future agents need:
+Consider updating an existing `AGENTS.md` when current work changes stable decision guidance future agents need:
 
 - a changed file appears in `critical_files`
 - a changed symbol appears in `critical_symbols`
-- a module responsibility, boundary, entry point, call flow, or verification path changed
+- a module responsibility, boundary, first-hop rule, call flow, skip rule, or verification path changed
 - an important directory was added, removed, renamed, or moved
 - the agent found a mismatch between existing guidance and current code evidence
-- the agent repeatedly had to scan the same directory because local guidance was missing
+- the agent repeatedly had to decide where to start or what to ignore because local guidance was missing
 - the user explicitly asked to update, refresh, or record knowledge
 
 Do not update the tree for every code change. Small implementation edits that do not change durable project understanding should leave the knowledge tree untouched.
 
 ## Tree Shape
 
-- Root files act as indexes and route agents.
-- Mid-level files describe module boundaries and common work.
-- Leaf files may describe stable implementation details.
+- Root files act as indexes and route agents to the next decision point.
+- Mid-level files describe stable task-routing rules, boundaries, and common first hops.
+- Leaf files may describe stable implementation decisions only when they reduce future task branching.
 - Child files must not repeat parent guidance.
 - Lower files may override parent rules only when the override is explicit and local.
 - Each `AGENTS.md` should be cohesive to its directory and should not store a full cross-module dependency map.
 
-Generated content should work as an entry map, not an encyclopedia. It should help future agents choose what to read next and avoid repeating stable reasoning. Do not duplicate a full API index, method inventory, or live dependency graph.
+Generated content should work as a decision map, not an encyclopedia. It should help future agents choose what to read or query next, what not to read first, and which checks prove a change. Do not duplicate a full API index, method inventory, current caller list, consumer list, or live dependency graph.
 
 For flat directories with many large files, create one route-oriented `AGENTS.md` first. Do not create file-level `AGENTS.md` files unless the code is reorganized into real subdirectories. If the directory remains too broad for useful local guidance, recommend code-structure refactoring separately from knowledge-tree maintenance.
 
 ## Cross-Module Handoff
 
-Use `AGENTS.md` to tell agents when cross-module reasoning is needed, not to store every relationship.
+Use `AGENTS.md` to tell agents when cross-module reasoning is needed and which code-intelligence target to start from, not to store every relationship.
 
 When work crosses a module boundary:
 
@@ -63,7 +64,22 @@ When work crosses a module boundary:
 3. Read the nearest `AGENTS.md` for any impacted module before editing across that boundary.
 4. Update `AGENTS.md` only when the cross-module rule is durable, such as "inspect downstream consumers before changing this response shape."
 
-Do not write lists of current callers, imports, or references into `AGENTS.md` unless they are intentionally stable architectural contracts.
+Do not write lists of current callers, imports, references, or consumers into `AGENTS.md` unless they are intentionally stable architectural contracts.
+
+## Generated Content Shape
+
+Prefer decision-compression sections over module-summary sections:
+
+- `Use This File When`: task shapes where this file should be read before broad source inspection.
+- `Skip This File When`: task shapes where another file, subtree, or code graph query should come first.
+- `First Hop Rules`: stable rules of the form "if task is X, start with Y."
+- `Cross-Module Checks`: stable boundary checks and the code-intelligence targets to inspect before editing across them.
+- `Verification Hints`: focused tests, commands, or review steps that usually prove this area.
+- `Evidence Notes`: concise evidence types behind the generated claims.
+
+Keep scope context short. A one-line ownership snapshot is useful when it explains why the routing rules apply, but directory responsibilities should not dominate the generated section.
+
+Allow negative guidance when it saves reasoning tokens, such as "do not start from `__init__.py` for permission bugs" or "transport-only changes usually do not require reading the full services subtree." Negative guidance must be evidence-backed and scoped to stable task shapes.
 
 ## Evidence Collection
 
@@ -162,11 +178,12 @@ After refresh, verify:
 
 ## Review Mode
 
-When reviewing an `AGENTS.md`, assess whether it reduces future reasoning cost:
+When reviewing an `AGENTS.md`, assess whether it reduces future decision cost:
 
-- Does it route agents to fewer files?
+- Does it route agents to the right first file, symbol, flow, or code-intelligence query?
+- Does it say when the file should be skipped?
 - Does it prevent repeated discovery of stable boundaries?
-- Does it avoid duplicating searchable details?
+- Does it avoid duplicating searchable details, current caller lists, or dependency inventories?
 - Are critical files and symbols precise enough for freshness checks?
 - Does it use declared code-intelligence evidence when that evidence is available?
 

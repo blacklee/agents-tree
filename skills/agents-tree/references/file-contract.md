@@ -4,7 +4,7 @@
 
 This contract applies to `AGENTS.md` files maintained in a target project by the Agents Tree skill.
 
-The skill repository is not the target knowledge tree. The target project owns the generated files.
+The skill repository is not the target decision-compression tree. The target project owns the generated files.
 
 ## Front Matter
 
@@ -97,6 +97,36 @@ Generated files should include a visible status section near the top of the gene
 
 This section helps humans and agents that do not have Agents Tree installed notice when knowledge should be re-checked.
 
+## Decision Compression
+
+Generated content should reduce future task-routing decisions. It should answer what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
+
+Do not use generated sections as module summaries. Keep directory scope context short and write decision rules that help future agents act:
+
+```md
+## Use This File When
+
+- Read this before broad source inspection when deciding where permission rules live.
+
+## Skip This File When
+
+- Skip this file for transport-only edits after the target handler is already known.
+
+## First Hop Rules
+
+- If the task is a permission bug, start with `src/permissions.ts`, then query references for `PermissionRule`.
+
+## Cross-Module Checks
+
+- Before changing the exported permission result shape, inspect current callers with the project code-intelligence tool.
+
+## Verification Hints
+
+- Permission rule changes are usually proved by `tests/permissions.test.ts`.
+```
+
+Negative guidance is allowed when it saves reasoning tokens, such as naming files or subtrees that should not be read first for a stable task shape. Do not add negative guidance as a broad prohibition; it must be scoped and evidence-backed.
+
 ## Evidence Notes
 
 Generated claims should be easy to verify without rereading broad code areas.
@@ -106,8 +136,8 @@ Use a short visible section when a file contains more than a few generated claim
 ```md
 ## Evidence Notes
 
-- Responsibility: supported by `src/example.ts` and `ExampleService`.
-- Entry points: supported by `src/index.ts`.
+- First-hop rule: supported by `src/example.ts` and `ExampleService`.
+- Skip rule: supported by source scan showing `src/example/index.ts` only re-exports symbols.
 - Cross-module check: inspect current references before changing `ExampleService` response shape.
 ```
 
@@ -115,7 +145,7 @@ Evidence notes should name the evidence type used, such as code graph query/cont
 
 Keep evidence notes concise. Do not turn them into a citation table or live dependency list.
 
-Generated content should route future agents toward the right evidence. It should not duplicate a full API index, method inventory, or live dependency graph that search and code-intelligence tools can produce.
+Generated content should route future agents toward the right evidence. It should not duplicate a full API index, method inventory, current caller list, consumer list, or live dependency graph that search and code-intelligence tools can produce.
 
 ## Conflict Sections
 
@@ -189,15 +219,14 @@ Parent/child instruction mismatches are conflicts even when both claims are gene
 Root and module files should use a small subset of:
 
 ```md
-# Module Overview
 # Knowledge Status
-# Evidence Notes
-# Architecture
-# Entry Points
-# Common Tasks
-# Rules
+# Use This File When
+# Skip This File When
+# First Hop Rules
+# Cross-Module Checks
+# Verification Hints
 # Do Not
-# Verification
+# Evidence Notes
 ```
 
 Only include sections that contain useful information. Empty headings waste context.

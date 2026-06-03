@@ -2,11 +2,11 @@
 
 ## Project Purpose
 
-This project builds a skill for maintaining verified `AGENTS.md` trees in other projects.
+This project builds a skill for maintaining verified `AGENTS.md` decision-compression trees in other projects.
 
-The product should help agents reduce repeated architecture reasoning by teaching them how to maintain directory-scoped project knowledge with freshness metadata.
+The product should help agents reduce repeated task-routing and architecture reasoning by teaching them how to maintain directory-scoped decision guidance with freshness metadata.
 
-The Agents Tree skill is not the project knowledge tree. The skill is the reusable maintenance workflow. The `AGENTS.md` tree belongs to the target repository where the skill is applied.
+The Agents Tree skill is not the target decision-compression tree. The skill is the reusable maintenance workflow. The `AGENTS.md` tree belongs to the target repository where the skill is applied.
 
 Do not frame this project as a generic memory system. Its core identity is:
 
@@ -25,6 +25,7 @@ Before adding implementation code or automation, preserve the product contract d
 - generated and human-maintained section boundaries
 - compatibility with existing `AGENTS.md`-aware agents
 - optional integration with code-intelligence tools
+- generated content focused on task routing, first-hop rules, skip guidance, boundary checks, and verification hints
 
 ## Architecture Direction
 
@@ -113,6 +114,8 @@ Conflict blocks should use relative Markdown links for known files and related `
 - Root `AGENTS.md` files should act as indexes, not encyclopedias.
 - Child `AGENTS.md` files should not repeat parent guidance.
 - Leaf files may include implementation details only when they are stable enough to be useful.
+- Generated content should prioritize decision compression over directory summaries.
+- Generated sections should say when to use the file, when to skip it, where to start, and which code-intelligence target or verification path matters.
 - Every generated claim should be traceable to files, symbols, imports, execution flows, or explicit human notes.
 - Stale knowledge should be surfaced clearly instead of silently trusted.
 - `last_verified_commit` should advance only after all recorded critical evidence and relevant current diffs or graph evidence have been checked.

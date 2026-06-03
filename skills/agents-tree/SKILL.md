@@ -1,19 +1,35 @@
 ---
 name: agents-tree
-description: Use when creating, checking, refreshing, or reviewing directory-scoped AGENTS.md knowledge trees in a target project; when maintaining project knowledge, freshness metadata, generated sections, human-protected sections, or stale AGENTS.md guidance for coding agents.
+description: Use when creating, checking, refreshing, or reviewing directory-scoped AGENTS.md decision-compression trees in a target project; when maintaining project decision guidance, freshness metadata, generated sections, human-protected sections, or stale AGENTS.md guidance for coding agents.
 ---
 
 # Agents Tree
 
 ## Purpose
 
-Maintain a verified `AGENTS.md` knowledge tree inside the target project.
+Maintain a verified `AGENTS.md` decision-compression tree inside the target project.
 
-This skill is only the maintenance workflow. The knowledge tree belongs to the target repository, is committed there, and must remain useful without this skill installed.
+This skill is only the maintenance workflow. The decision-compression tree belongs to the target repository, is committed there, and must remain useful without this skill installed.
+
+Generated `AGENTS.md` files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
+
+## Decision Compression Value
+
+Create or refresh generated knowledge only when it reduces concrete future reasoning cost:
+
+- first-hop reasoning: where the next agent should start for a known task shape
+- code-intelligence targeting: which symbol, file, or flow to query first
+- boundary reasoning: when a change must cross-check another module
+- verification reasoning: which focused checks usually prove this area
+- skip reasoning: when this `AGENTS.md` or subtree should not be read first
+
+Use code graph, code-intelligence, structural search, or language-aware navigation for live facts. Use `AGENTS.md` for stable decision rules that route agents toward those facts. Do not store current caller lists, dependency inventories, consumer lists, or full API maps in generated sections unless the relationship is an intentionally stable contract.
+
+Before creating a child `AGENTS.md`, state the specific decision cost it saves. If the answer is vague, do not create the file.
 
 ## Operating Modes
 
-- **Create**: add a minimal `AGENTS.md` tree where directory-level guidance will reduce repeated agent reasoning.
+- **Create**: add a minimal `AGENTS.md` tree where directory-level guidance will reduce future decision branches.
 - **Check**: inspect existing metadata and code evidence, then report `VALID`, `STALE_WARNING`, or `INVALID`.
 - **Refresh**: update generated sections after reviewing current code evidence.
 - **Review**: evaluate whether proposed knowledge changes are accurate, scoped, and safe for future agents.
@@ -22,22 +38,22 @@ If the user only asks to check, inspect, analyze, or review, do not edit files u
 
 ## Mode Selection
 
-- User asks to add missing guidance, start a tree, or avoid repeated scans: **Create**.
+- User asks to add missing guidance, start a tree, avoid repeated scans, or reduce task-routing decisions: **Create**.
 - User asks whether current knowledge is trustworthy, stale, valid, or safe to use: **Check**.
-- User asks to update, refresh, rewrite generated knowledge, or record changed project knowledge: **Refresh**.
+- User asks to update, refresh, rewrite generated guidance, or record changed project decision guidance: **Refresh**.
 - User asks to evaluate proposed `AGENTS.md` changes: **Review**.
 - If wording is ambiguous, choose **Check** and recommend the next action instead of editing.
 
 ## Update Triggers
 
-Consider updating the tree when work changes stable knowledge that future agents need:
+Consider updating the tree when work changes stable decision guidance that future agents need:
 
 - edited files or symbols listed in `critical_files` or `critical_symbols`
 - changed directory responsibility, entry points, call flows, ownership boundaries, or verification steps
 - added, removed, renamed, or moved an important module directory
 - discovered an existing `AGENTS.md` claim that conflicts with current code evidence
-- repeatedly scanned the same directory because useful local guidance was missing
-- user explicitly asked to update, refresh, or record project knowledge
+- repeatedly scanned the same directory because useful routing or skip guidance was missing
+- user explicitly asked to update, refresh, or record project decision guidance
 
 Do not update the tree for every code change. Update it only when the change affects durable guidance future agents should rely on.
 
@@ -48,11 +64,12 @@ Do not update the tree for every code change. Update it only when the change aff
 3. Validate ownership and section markers before editing.
 4. Stop knowledge-tree maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
 5. If applicable project guidance declares a code graph or code-intelligence tool, **MUST** use it before creating, reviewing, or refreshing generated knowledge; use `grep`/`rg` only as supplementary evidence.
-6. Decide whether the target directory needs an `AGENTS.md`; state the token-saving reason before creating a child file.
+6. Decide whether the target directory needs an `AGENTS.md`; state the decision-compression reason before creating a child file.
 7. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
-8. Update only managed generated sections unless the user explicitly asks to edit human sections.
-9. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
-10. Summarize touched files, evidence reviewed, freshness status, and unresolved conflicts.
+8. Write generated sections as routing rules: when to use this file, when to skip it, first-hop rules, cross-module checks, and verification hints.
+9. Update only managed generated sections unless the user explicitly asks to edit human sections.
+10. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
+11. Summarize touched files, evidence reviewed, freshness status, decision cost saved, and unresolved conflicts.
 
 ## Section Safety
 
@@ -72,8 +89,8 @@ When a task touches critical symbols, APIs, data shapes, call flows, ownership b
 
 1. Use a code graph or code-intelligence tool to find real callers, callees, references, and impact.
 2. If the result points to another module, read that module's nearest `AGENTS.md` before editing across the boundary.
-3. Record only stable handoff guidance, such as when to inspect references before changing an interface.
-4. Do not copy live dependency lists into `AGENTS.md`; those belong in graph/search tools.
+3. Record only stable handoff guidance, such as which code-intelligence target to inspect before changing an interface.
+4. Do not copy live dependency lists, current callers, or consumer inventories into `AGENTS.md`; those belong in graph/search tools.
 
 ## File Contract
 
@@ -128,7 +145,7 @@ Before writing `critical_symbols`, verify each entry resolves to a real code sym
 
 Use short `Evidence Notes` for generated files with multiple claims; name the evidence type used. Do not write live dependency lists.
 
-Generated content should help future agents choose what to read next. Do not duplicate a full API index, method inventory, or dependency graph that search or code-intelligence tools can produce.
+Generated content should help future agents choose what to read or query next. Prefer task-routing rules, first-hop guidance, skip guidance, cross-module checks, and focused verification hints. Do not duplicate a full API index, method inventory, or dependency graph that search or code-intelligence tools can produce.
 
 ## Freshness Labels
 

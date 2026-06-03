@@ -10,7 +10,7 @@ agents_tree_keep: []
 agents_tree_skip: []
 ---
 
-# Module Overview
+# Module Decision Guide
 
 <!-- agents-tree:generated:start -->
 ## Knowledge Status
@@ -20,44 +20,40 @@ agents_tree_skip: []
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Keep only stable local guidance. -->
+<!-- Delete unused generated headings before committing this file. Keep only stable local decision guidance. -->
+
+## Decision Compression
+
+- This file exists to avoid repeated reasoning about which local rule, entry layer, boundary, or verification path applies.
+- It saves reasoning about: `DECISION_1`, `DECISION_2`, `DECISION_3`.
+
+## Use This File When
+
+- Use this when deciding where to start inside this module for `TASK_SHAPE`.
+- Use this before changing local boundaries, exported data shapes, or durable rules.
+
+## Skip This File When
+
+- Skip this when the target symbol is already known and the change is implementation-only inside that symbol.
+- Skip this when `TASK_SHAPE` belongs to `neighboring/module` instead of this subtree.
+
+## First Hop Rules
+
+- If task is `TASK_SHAPE`, start with `path/to/file` or symbol `SymbolName`.
+- If issue looks like `PATTERN`, skip `path/to/tempting-file` and query references for `SymbolName` first.
+
+## Cross-Module Checks
+
+- Before changing `BOUNDARY_SYMBOL_OR_DATA_SHAPE`, inspect current callers, callees, or consumers with the declared code-intelligence tool.
+
+## Verification Hints
+
+- For `TASK_SHAPE`, run or inspect `focused verification command or test path`.
 
 ## Evidence Notes
 
 - Evidence type: code graph/context, source scan, tests, commit diff, or explicit human note.
 - Symbol check: every `critical_symbols` entry resolves to a real code symbol.
-
-## Responsibility
-
-Describe what this directory owns.
-
-## Architecture
-
-Describe stable boundaries, collaborators, and data flow.
-
-## Entry Points
-
-- `path/to/file`: why agents usually start here.
-
-## Cross-Module Checks
-
-- Stable boundary: when changing this interface or data shape, inspect current references with a code graph or code-intelligence tool before editing related modules.
-
-## Common Tasks
-
-- Task: files or symbols usually involved.
-
-## Rules
-
-- Local rules that agents must follow in this subtree.
-
-## Do Not
-
-- Things that are tempting but wrong in this module.
-
-## Verification
-
-- Focused checks for this module.
 <!-- agents-tree:generated:end -->
 
 <!-- agents-tree:human:start -->

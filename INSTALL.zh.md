@@ -8,7 +8,7 @@
 skills/agents-tree/
 ```
 
-安装后，skill 会指导 Agent 在目标项目里创建、检查或刷新 `AGENTS.md` 知识树。目标项目里的知识树仍然属于目标项目，和这个 skill 仓库不是同一件东西。
+安装后，skill 会指导 Agent 在目标项目里创建、检查或刷新 `AGENTS.md` 决策压缩树。目标项目里的决策压缩树仍然属于目标项目，和这个 skill 仓库不是同一件东西。
 
 ## 安装前确认
 
@@ -54,14 +54,14 @@ cp -R /path/to/agents-tree/skills/agents-tree .agents/skills/agents-tree
 
 然后把 `.agents/skills/agents-tree` 提交到目标项目仓库。
 
-项目级安装会把 skill 放进目标项目；但它维护的 `AGENTS.md` 知识树仍然是目标项目自己的知识树。
+项目级安装会把 skill 放进目标项目；但它维护的 `AGENTS.md` 决策压缩树仍然是目标项目自己的决策压缩树。
 
 ## Codex 中如何调用
 
 显式调用：
 
 ```text
-$agents-tree 检查这个仓库是否适合创建 AGENTS.md 知识树，只分析不改文件。
+$agents-tree 检查这个仓库是否适合创建 AGENTS.md 决策压缩树，只分析不改文件。
 ```
 
 或者：
@@ -115,7 +115,7 @@ Hooks 更适合做强制检查、审计或团队策略，不是这个项目的 M
 可以用下面的提示测试安装是否生效：
 
 ```text
-$agents-tree 只分析当前项目：哪些目录适合建立 AGENTS.md 知识树？不要修改文件。
+$agents-tree 只分析当前项目：哪些目录适合建立 AGENTS.md 决策压缩树？不要修改文件。
 ```
 
 理想行为：

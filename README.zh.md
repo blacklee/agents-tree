@@ -1,12 +1,12 @@
 # Agents Tree
 
-面向 Codex、Claude Code、Cursor Agent、opencode 等编码 Agent 的项目知识树维护 skill。
+面向 Codex、Claude Code、Cursor Agent、opencode 等编码 Agent 的项目决策压缩树维护 skill。
 
-Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如何在其他项目里维护一棵 `AGENTS.md` 文件树。那棵文件树属于目标项目，和这个 skill 本身无关。
+Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如何在其他项目里维护一棵 `AGENTS.md` 决策压缩树。那棵文件树属于目标项目，和这个 skill 本身无关。
 
-换句话说：`agents-tree` 是维护流程，`AGENTS.md` 文件树是被维护的项目知识层。
+换句话说：`agents-tree` 是维护流程，`AGENTS.md` 文件树是被维护的项目决策压缩层。
 
-> 当前状态：早期项目。这个仓库先定义产品方向、文件契约，以及用 skill 在目标项目里维护知识树的工作流。
+> 当前状态：早期项目。这个仓库先定义产品方向、文件契约，以及用 skill 在目标项目里维护决策压缩树的工作流。
 
 安装方式见：[`INSTALL.zh.md`](INSTALL.zh.md)。
 
@@ -20,15 +20,15 @@ Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如�
 - 判断旧文档是否可信
 - 每次改动前重新做一轮架构推理
 
-代码图、repo map、语义搜索这类工具可以降低“读代码”的成本。Agents Tree 关注另一部分成本：重复推理。
+代码图、repo map、语义搜索这类工具可以降低“读代码”的成本。Agents Tree 关注另一部分成本：反复判断下一步该查哪里、该查什么图目标、哪些边界要复核、哪些内容不用先看。
 
-它通过指导 Agent 在目标项目目录中维护一棵 `AGENTS.md` 文件树来解决这个问题。越靠近根目录，内容越像索引；越靠近代码叶子目录，内容越具体。
+它通过指导 Agent 在目标项目目录中维护一棵 `AGENTS.md` 文件树来解决这个问题。越靠近根目录，内容越像索引；越靠近代码叶子目录，越具体地记录本地第一跳、跳过规则、边界检查和验证路径。
 
 ## 核心思路
 
 Agent 已经知道怎么读 `AGENTS.md`。
 
-Agents Tree 不要求 Agent 学一套新的记忆运行时，而是沿用现有机制：目标项目里的每个重要目录可以拥有自己的 `AGENTS.md`，只描述这个目录子树相关的知识。
+Agents Tree 不要求 Agent 学一套新的记忆运行时，而是沿用现有机制：目标项目里的每个重要目录可以拥有自己的 `AGENTS.md`，只描述这个目录子树相关的稳定决策指引。
 
 ```text
 project/
@@ -43,16 +43,17 @@ project/
 │       └── AGENTS.md
 ```
 
-上层文件回答“Agent 应该去哪里看”。下层文件回答“Agent 在这里动代码前必须知道什么”。
+上层文件回答“Agent 下一步该去哪里看”。下层文件回答“Agent 在这里动代码前，该先查哪个入口、哪个边界、哪个跳过规则或哪个验证”。
 
-这个 skill 自己不是知识树。它只是维护知识树的方法。知识树保存在目标项目里，跟随目标项目提交、review 和演进；即使没有安装 Agents Tree skill，那些 `AGENTS.md` 文件仍然能被普通 Agent 读取。
+这个 skill 自己不是目标树。它只是维护这棵树的方法。决策压缩树保存在目标项目里，跟随目标项目提交、review 和演进；即使没有安装 Agents Tree skill，那些 `AGENTS.md` 文件仍然能被普通 Agent 读取。
 
 ## 和普通 Agent Memory 的区别
 
 Agents Tree 不主打“记住所有东西”。
 
-它主打五件事：
+它主打六件事：
 
+- **决策压缩**：自动生成指引应该减少后续任务分流判断。
 - **目录作用域**：知识结构和源码目录结构一致。
 - **新鲜度检测**：每份生成知识都记录它基于哪些代码证据。
 - **人类可审查**：知识更新体现为普通 Git diff。
@@ -138,8 +139,8 @@ Agents Tree 不需要专门的 CLI。
 
 它的核心维护方式是 skill 驱动的对话和文件编辑：
 
-- 人类让使用 Agents Tree skill 的 Agent 创建或更新目标项目里的 `AGENTS.md` 知识树。
-- Agent 读取已有知识树，只检查必要的代码证据，然后提出局部修改。
+- 人类让使用 Agents Tree skill 的 Agent 创建或更新目标项目里的 `AGENTS.md` 决策压缩树。
+- Agent 读取已有决策压缩树，只检查必要的代码证据，然后提出局部修改。
 - 人类 review 普通 Git diff。
 - Agent 更新时必须保护人工维护区。
 
@@ -239,16 +240,16 @@ agents_tree_skip: []
 
 ## 更新触发时机
 
-当一次改动影响未来 Agent 需要依赖的稳定知识时，Agent 才应该考虑更新知识树：
+当一次改动影响未来 Agent 需要依赖的稳定决策指引时，Agent 才应该考虑更新决策压缩树：
 
 - 修改了 `critical_files` 或 `critical_symbols` 记录的文件或符号。
 - 模块职责、入口文件、调用流程、职责边界或验证方式发生变化。
 - 重要模块目录被新增、删除、重命名或移动。
 - 发现现有 `AGENTS.md` 指引和当前代码事实冲突。
 - Agent 反复扫描同一个目录，说明这里缺少有用的局部指引。
-- 用户明确要求更新、刷新或记录项目知识。
+- 用户明确要求更新、刷新或记录项目决策指引。
 
-不是每次代码修改都要更新知识树。普通实现细节改动如果没有改变稳定的项目理解，就应该保持知识树不变。
+不是每次代码修改都要更新决策压缩树。普通实现细节改动如果没有改变稳定的项目理解或任务分流规则，就应该保持这棵树不变。
 
 ## 跨模块串联
 
@@ -266,22 +267,24 @@ AGENTS.md 负责启动本地推理。
 
 ## 推荐的 `AGENTS.md` 结构
 
-生成文件应该短、清晰、稳定：
+生成文件应该短、清晰、稳定，并优先服务任务分流：
 
 ```md
-# Module Overview
+# Knowledge Status
 
-# Architecture
+# Decision Compression
 
-# Entry Points
+# Use This File When
 
-# Common Tasks
+# Skip This File When
 
-# Rules
+# First Hop Rules
 
-# Do Not
+# Cross-Module Checks
 
-# Verification
+# Verification Hints
+
+# Evidence Notes
 ```
 
 根目录文件应该像索引。叶子目录文件才适合写实现细节。
@@ -290,6 +293,7 @@ AGENTS.md 负责启动本地推理。
 
 - 宁可短而可信，也不要长而含糊。
 - 根部知识抽象，叶子知识具体。
+- 优先写任务分流和第一跳规则，不要写成目录摘要。
 - 子文件不要重复父文件已经说过的内容。
 - 自动生成的结论必须能追溯到文件、符号、调用流或人工说明。
 - 过期知识比没有知识更危险。
@@ -302,9 +306,9 @@ Agents Tree 可以和 repo map、Agent memory、代码图工具一起工作。
 
 - 代码图工具回答“代码现在实际怎么跑”。
 - Memory 工具保存跨会话事实和决策。
-- Agents Tree 给 Agent 提供可验证、目录级的项目知识入口。
+- Agents Tree 给 Agent 提供可验证、目录级的决策指引入口。
 
-它不需要替代这些系统。更好的定位是：提供一个可复用的 Agent skill，让 Agent 能在任意目标项目里维护简单、可审查、可被继续读取的 `AGENTS.md` 知识树。
+它不需要替代这些系统。更好的定位是：提供一个可复用的 Agent skill，让 Agent 能在任意目标项目里维护简单、可审查、可被继续读取的 `AGENTS.md` 决策压缩树。
 
 常见配套工具包括：
 

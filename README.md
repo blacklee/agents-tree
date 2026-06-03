@@ -1,12 +1,12 @@
 # Agents Tree
 
-A skill for maintaining verified project knowledge trees for `AGENTS.md`-compatible coding agents.
+A skill for maintaining verified decision-compression trees for `AGENTS.md`-compatible coding agents.
 
-Agents Tree is a skill for coding agents such as Codex, Claude Code, Cursor Agent, and opencode. The skill teaches agents how to create and maintain a directory-scoped, reviewable, freshness-checked `AGENTS.md` knowledge tree inside another project.
+Agents Tree is a skill for coding agents such as Codex, Claude Code, Cursor Agent, and opencode. The skill teaches agents how to create and maintain a directory-scoped, reviewable, freshness-checked `AGENTS.md` decision-compression tree inside another project.
 
-The goal is simple: let agents spend fewer tokens rediscovering architecture, and more of their budget making correct changes.
+The goal is simple: let agents spend fewer tokens deciding where to inspect next, and more of their budget making correct changes.
 
-> Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining knowledge trees inside target projects.
+> Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining decision-compression trees inside target projects.
 
 Installation guide: [`INSTALL.zh.md`](INSTALL.zh.md).
 
@@ -20,15 +20,15 @@ Large repositories make coding agents repeatedly pay for the same work:
 - deciding whether old documentation is still trustworthy
 - redoing architecture reasoning before each small change
 
-Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated reasoning.
+Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated decision-making about where to inspect, what to query, which boundaries to check, and what to ignore first.
 
-It does that by guiding an agent to maintain a tree of `AGENTS.md` files across the target repository. Root files stay short and act like indexes. Lower-level files become more specific as they get closer to the code they describe.
+It does that by guiding an agent to maintain a tree of `AGENTS.md` files across the target repository. Root files stay short and act like indexes. Lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
 
 ## Core Idea
 
 Agents already know how to read `AGENTS.md`.
 
-Agents Tree builds on that existing behavior instead of introducing a separate memory system. Each directory in the target project can contain an `AGENTS.md` file that describes only the knowledge relevant to that subtree.
+Agents Tree builds on that existing behavior instead of introducing a separate memory system. Each directory in the target project can contain an `AGENTS.md` file that describes only the stable decision guidance relevant to that subtree.
 
 ```text
 project/
@@ -43,16 +43,17 @@ project/
 │       └── AGENTS.md
 ```
 
-Higher files answer "where should the agent go?" Lower files answer "what must the agent know before editing here?"
+Higher files answer "where should the agent go next?" Lower files answer "what first hop, boundary check, skip rule, or verification hint matters before editing here?"
 
-The skill itself is not the knowledge tree. It is the maintenance workflow. The tree belongs to the project being worked on, is committed with that project, and remains useful even when Agents Tree is not installed.
+The skill itself is not the target tree. It is the maintenance workflow. The tree belongs to the project being worked on, is committed with that project, and remains useful even when Agents Tree is not installed.
 
 ## What Makes It Different
 
 Agents Tree is not meant to be another general-purpose agent memory store.
 
-It is designed around five constraints:
+It is designed around six constraints:
 
+- **Decision compression**: generated guidance should reduce future task-routing decisions.
 - **Directory scope**: knowledge follows the same tree as the source code.
 - **Freshness checks**: every generated knowledge file records what code evidence it was verified against.
 - **Human review**: generated sections are reviewable diffs, and human-maintained sections are protected.
@@ -221,14 +222,14 @@ Use `agents_tree_skip` for extra paths to ignore, and `agents_tree_keep` for rar
 
 ## Update Triggers
 
-Agents should consider updating the tree when a change affects stable knowledge future agents need:
+Agents should consider updating the tree when a change affects stable decision guidance future agents need:
 
 - files or symbols recorded in `critical_files` or `critical_symbols` changed
 - module responsibility, entry points, call flows, ownership boundaries, or verification steps changed
 - important module directories were added, removed, renamed, or moved
 - existing `AGENTS.md` guidance conflicts with current code evidence
 - agents repeatedly scan the same directory because useful local guidance is missing
-- the user explicitly asks to update, refresh, or record project knowledge
+- the user explicitly asks to update, refresh, or record project decision guidance
 
 Not every code change should update the tree. Small implementation edits should leave it untouched unless they change durable project understanding.
 
@@ -248,22 +249,24 @@ The next AGENTS.md provides local context for the impacted module.
 
 ## Recommended `AGENTS.md` Shape
 
-Generated files should stay short and structured:
+Generated files should stay short and decision-oriented:
 
 ```md
-# Module Overview
+# Knowledge Status
 
-# Architecture
+# Decision Compression
 
-# Entry Points
+# Use This File When
 
-# Common Tasks
+# Skip This File When
 
-# Rules
+# First Hop Rules
 
-# Do Not
+# Cross-Module Checks
 
-# Verification
+# Verification Hints
+
+# Evidence Notes
 ```
 
 Root-level files should behave like indexes. Leaf-level files may include implementation details.
@@ -272,6 +275,7 @@ Root-level files should behave like indexes. Leaf-level files may include implem
 
 - Prefer trustworthy short context over exhaustive documentation.
 - Keep root knowledge abstract and leaf knowledge concrete.
+- Prefer task-routing and first-hop rules over directory summaries.
 - Do not duplicate parent knowledge in child files.
 - Record evidence for every generated claim.
 - Treat stale knowledge as worse than missing knowledge.
@@ -284,9 +288,9 @@ Agents Tree can work alongside repo-map and memory tools.
 
 - Code graph tools explain what the code currently does.
 - Memory tools preserve cross-session facts and decisions.
-- Agents Tree routes agents through verified, directory-scoped project knowledge.
+- Agents Tree routes agents through verified, directory-scoped decision guidance.
 
-The intended role is not to replace those systems, but to give agents a reusable skill for maintaining a simple, reviewable `AGENTS.md` knowledge tree inside any project.
+The intended role is not to replace those systems, but to give agents a reusable skill for maintaining a simple, reviewable `AGENTS.md` decision-compression tree inside any project.
 
 Common companion tools include:
 
