@@ -8,6 +8,8 @@ The goal is simple: let agents spend fewer tokens rediscovering architecture, an
 
 > Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining knowledge trees inside target projects.
 
+Installation guide: [`INSTALL.zh.md`](INSTALL.zh.md).
+
 ## Why
 
 Large repositories make coding agents repeatedly pay for the same work:
