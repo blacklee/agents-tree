@@ -8,7 +8,7 @@ The installed skill is this directory:
 skills/agents-tree/
 ```
 
-After installation, the skill guides an agent to create, check, or refresh AGENTS.md-compatible decision guidance in a target project. That target project's guidance still belongs to the target project, not to this skill repository.
+After installation, the skill guides an agent to create, check, refresh, or review AGENTS.md-compatible decision guidance in a target project. That target project's guidance still belongs to the target project, not to this skill repository.
 
 ## Before Installing
 

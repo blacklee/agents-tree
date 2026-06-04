@@ -21,9 +21,11 @@ Sidecar mode is optional and must be explicit. It is appropriate when a project 
 In sidecar mode:
 
 - Use one sidecar name consistently across the tree; prefer `decision-router.md` unless the human chooses another name.
-- Keep a short root `AGENTS.md` pointer that tells agents to read applicable sidecar files from the repository root to the target directory before broad source inspection.
+- Discover sidecar files from the repository root that owns both the maintained artifact and target code. If nested repositories, submodules, or package roots make ownership ambiguous, report the ambiguity and do not classify sidecar guidance as `VALID` until the owner root is established.
+- Keep a short root `AGENTS.md` pointer that tells agents to read applicable sidecar files from that repository root to the target directory before broad source inspection.
+- If adding or changing the pointer would modify a human-owned, strict, or unmarked root `AGENTS.md`, ask for explicit approval before editing it. If approval is not given, report that sidecar guidance exists but may not be reliably discovered.
 - Apply this same file contract to sidecar files: front matter, managed sections, freshness metadata, conflict blocks, and review rules.
-- Do not maintain sidecar and native guidance for the same directory unless a human explicitly asks to migrate or resolve the overlap.
+- Do not maintain sidecar and native generated guidance for the same directory or overlapping ancestor/descendant subtree unless a human explicitly asks to migrate, intentionally split, or resolve the overlap. Record that decision in the nearest authoritative guidance artifact before refreshing either side.
 
 Recommended root pointer:
 
@@ -34,7 +36,7 @@ files from the repository root to the target directory before broad code inspect
 
 ## Front Matter
 
-Every maintained decision-guidance artifact should begin with YAML front matter:
+Every maintained decision-guidance artifact must begin with YAML front matter:
 
 ```yaml
 ---
@@ -56,9 +58,9 @@ agents_tree_skip: []
 
 - `knowledge_type`: `architecture`, `module`, `implementation`, or `workflow`.
 - `module`: human-readable module or directory name.
-- `last_verified_commit`: commit where the generated knowledge was last checked.
-- `critical_files`: files whose changes may invalidate this knowledge.
-- `critical_symbols`: real code symbols whose changes may invalidate this knowledge, such as functions, classes, types, exported modules, route handlers, jobs, or flow entry points.
+- `last_verified_commit`: commit where the generated guidance was last checked.
+- `critical_files`: files whose changes may invalidate this guidance.
+- `critical_symbols`: real code symbols whose changes may invalidate this guidance, such as functions, classes, types, exported modules, route handlers, jobs, or flow entry points.
 - `confidence`: `high`, `medium`, or `low`.
 - `owner`: usually `ai-generated`; use `human-maintained` only when the whole file is intentionally human-owned.
 - `agents_tree_keep`: short optional glob list for paths that should be considered even if ignore files would normally exclude them.
@@ -68,9 +70,17 @@ Keep `agents_tree_keep` and `agents_tree_skip` very small. Prefer existing `.git
 
 `agents_tree_keep` must not reopen secrets, credentials, dependency directories, build outputs, generated artifacts, or vendored code unless a human explicitly asks for that exact path in the current task. Broad keep globs are invalid.
 
+Do not record a current-task ignore exception in durable `agents_tree_keep` unless the human explicitly asks to make that exact exception permanent and the path is safe for future tasks. Otherwise mention the one-time exception only in the current response or local evidence notes.
+
+Recorded `critical_files` and `critical_symbols` must be checked even when they match `agents_tree_skip`. If recorded evidence is hidden by project ignore files or cannot be checked safely, report `INVALID` or cannot verify instead of treating the skipped evidence as trustworthy.
+
 If `owner: human-maintained`, do not edit any part of the file unless the user explicitly asks to edit that human-owned file. Section markers do not override whole-file ownership.
 
 If no usable commit SHA exists, use `last_verified_commit: unknown`, set `confidence: low`, and do not classify the file as `VALID`.
+
+If generated guidance depends on uncommitted working-tree changes, do not set `last_verified_commit` as though `HEAD` contains that evidence. Wait for the source changes to be committed, or record a visible working-tree evidence note and classify conservatively until a real commit contains the verified evidence.
+
+New generated guidance with empty `critical_files` and empty `critical_symbols` should use `confidence: low` unless `Evidence Notes` names another concrete checked source, such as explicit human notes or verified repository structure. Empty recorded evidence cannot support `VALID` by itself.
 
 Before writing or refreshing `critical_symbols`, verify each entry resolves to a real code symbol using the project-declared code-intelligence tool or focused source evidence. Do not include route names, aliases, approximate labels, or task notes in metadata unless they are the actual symbol name. Put non-symbol notes in `Evidence Notes` instead.
 
@@ -97,6 +107,8 @@ Allowed `status` values:
 - `resolved`: the audience boundary was reviewed and no active suggestion remains; re-check only after reviewed files change.
 
 This metadata is advisory. It does not make the `AGENTS.md` stale or invalid by itself.
+
+If `checked_at_commit` is `unknown`, cannot be compared, or any listed file was renamed, deleted, or replaced, treat repeat suppression as uncertain and re-run the advisory review. Do not rely on `resolved` suppression until the current file set has been reviewed.
 
 ### Front Matter Boundaries
 
@@ -133,6 +145,7 @@ Before editing, parse section markers:
 - starts and ends must be paired, ordered, and not nested
 - malformed markers make the file `INVALID` for refresh
 - text outside managed sections is human-maintained and must be preserved byte-for-byte
+- unresolved template placeholders in front matter, generated sections, `Knowledge Status`, or `Evidence Notes` make the file `INVALID`
 
 If an existing `AGENTS.md` lacks managed markers, treat all existing body text as human-maintained by default. Preserve it byte-for-byte unless the user explicitly asks to normalize it.
 
@@ -151,7 +164,7 @@ Generated files should include a visible status section near the top of the gene
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 ```
 
-This section helps humans and agents that do not have Agents Tree installed notice when knowledge should be re-checked.
+This section helps humans and agents that do not have Agents Tree installed notice when guidance should be re-checked.
 
 ## Decision Compression
 
@@ -209,7 +222,7 @@ Generated content should route future agents toward the right evidence. It shoul
 
 ## Conflict Sections
 
-If generated knowledge conflicts with human text, record the conflict in the file instead of overwriting either side:
+If generated guidance conflicts with human text, record the conflict in the file instead of overwriting either side:
 
 ```md
 <!-- agents-tree:conflict:start -->
@@ -247,7 +260,7 @@ Summarize the current code evidence. Use relative Markdown links for known concr
 
 ## Cross-Module Context
 
-Summarize only the external module knowledge needed for human judgment, including relevant neighboring guidance claims or graph evidence.
+Summarize only the external module guidance needed for human judgment, including relevant neighboring guidance claims or graph evidence.
 
 ## Required Resolution
 
@@ -255,13 +268,15 @@ Ask a human to update the human section, update the generated section, or explai
 <!-- agents-tree:conflict:end -->
 ```
 
-An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
+An unresolved conflict blocks guidance maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
 
 After a human resolves the conflict, remove the conflict block or change `status` to `resolved` with a short resolution note.
 
+Before maintenance, parse conflict blocks as managed safety markers. Missing, duplicated, or unrecognized conflict `status` values make the file `INVALID` for guidance maintenance. Treat `status: resolved` as non-blocking only when a short resolution note is present; otherwise require human review.
+
 Conflict blocks must be self-explanatory. Humans and agents that have not installed Agents Tree should still understand that the local guidance is not authoritative until the conflict is resolved.
 
-Conflict blocks are allowed to include cross-module context because they are human decision records, not ordinary module knowledge. Include only what helps resolve the conflict. Do not use conflict blocks to create permanent dependency maps.
+Conflict blocks are allowed to include cross-module context because they are human decision records, not ordinary module guidance. Include only what helps resolve the conflict. Do not use conflict blocks to create permanent dependency maps.
 
 When writing conflict blocks, use relative Markdown links for concrete files, tests, and `AGENTS.md` nodes whenever the path is already known. Do not invent links or scan broadly just to add links.
 
@@ -306,13 +321,20 @@ Use code-intelligence tools when available. If they are unavailable, use focused
 Decision checklist:
 
 - Missing or malformed metadata or managed markers in a managed file: `INVALID`.
+- Unresolved template placeholders such as `COMMIT_SHA`, `TASK_SHAPE`, `DECISION_1`, `SymbolName`, or `path/to/file`: `INVALID`.
 - Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until the new evidence is verified. Keep the old metadata while investigating; do not delete missing evidence entries merely to make the file pass freshness review.
+- Recorded critical evidence hidden by `agents_tree_skip`, project ignore files, or unavailable tools: check it anyway when safe; otherwise report `INVALID` or cannot verify.
 - Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
 - Changed critical file with stable responsibility and key flows after focused review: `STALE_WARNING`.
+- Empty `critical_files` and empty `critical_symbols` without concrete evidence notes: cannot be `VALID`.
 - No relevant recorded evidence or current references/flows changed: `VALID`.
 - Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
 
 Advance `last_verified_commit` only after checking every recorded critical file and symbol, plus current diffs or code-intelligence evidence that affects generated claims. Do not advance it when any recorded evidence cannot be checked.
+
+If the declared code-intelligence tool is unavailable, stale, or partial, record the limitation in `Evidence Notes` or the review report. The bounded no-tool sequence may support `STALE_WARNING`, `INVALID`, or cannot verify; it supports `VALID` only when every generated claim is fully re-evidenced without the missing tool.
+
+If generated claims are verified against uncommitted working-tree changes, keep `last_verified_commit` at the last committed evidence state and record the working-tree limitation visibly. Do not advance it to `HEAD` until `HEAD` contains the verified evidence.
 
 After refresh, run a metadata consistency check:
 

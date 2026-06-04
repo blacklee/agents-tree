@@ -4,7 +4,7 @@ module: PROJECT_NAME
 last_verified_commit: COMMIT_SHA
 critical_files: []
 critical_symbols: []
-confidence: high
+confidence: low
 owner: ai-generated
 agents_tree_keep: []
 agents_tree_skip: []
@@ -16,11 +16,11 @@ agents_tree_skip: []
 ## Knowledge Status
 
 - Last verified: `COMMIT_SHA`
-- Confidence: high
+- Confidence: low
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Root files should route agents, not summarize the project. Delete any bullet that does not change the next action. -->
+<!-- Before committing, replace or delete all placeholders such as COMMIT_SHA, TASK_SHAPE, DECISION_1, SymbolName, and path/to/file. Unresolved placeholders make this guidance invalid. Delete unused generated headings. Root files should route agents, not summarize the project. Delete any bullet that does not change the next action. -->
 
 ## Decision Compression
 

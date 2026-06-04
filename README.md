@@ -70,7 +70,9 @@ For Agents Tree decision guidance, read applicable `decision-router.md`
 files from the repository root to the target directory before broad code inspection.
 ```
 
-Sidecar mode is a trade-off. It keeps instruction files cleaner, but it depends on the root `AGENTS.md` pointer for discovery. Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory unless a human explicitly asks to migrate or resolve the overlap.
+Sidecar mode is a trade-off. It keeps instruction files cleaner, but it depends on the root `AGENTS.md` pointer for discovery. Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory or overlapping subtree unless a human explicitly asks to migrate or resolve the overlap.
+
+Adding that pointer to a strict, unmarked, or human-owned root `AGENTS.md` is a separate explicit edit. If the project chooses sidecar mode but does not approve the pointer change, the agent should report that sidecar guidance may not be reliably discovered.
 
 ## What Makes It Different
 
@@ -79,15 +81,15 @@ Agents Tree is not meant to be another general-purpose agent memory store.
 It is designed around six constraints:
 
 - **Decision compression**: generated guidance should reduce future task-routing decisions.
-- **Directory scope**: knowledge follows the same tree as the source code.
-- **Freshness checks**: every generated knowledge file records what code evidence it was verified against.
+- **Directory scope**: decision guidance follows the same tree as the source code.
+- **Freshness checks**: every generated guidance file records what code evidence it was verified against.
 - **Human review**: generated sections are reviewable diffs, and human-maintained sections are protected.
 - **Agent compatibility**: the default output is ordinary `AGENTS.md`; optional sidecar mode still routes through a short root `AGENTS.md` pointer.
-- **Skill-based maintenance**: the reusable part is the agent workflow; the generated knowledge stays inside the target repository.
+- **Skill-based maintenance**: the reusable part is the agent workflow; the generated guidance stays inside the target repository.
 
 Agents Tree may also report lightweight audience-boundary suggestions when human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` coexist in one directory. This is advisory: it helps keep human onboarding content and agent decision guidance in the right place, but it does not turn Agents Tree into a general README maintenance tool.
 
-## Knowledge Metadata
+## Guidance Metadata
 
 Each generated native `AGENTS.md` starts with YAML front matter:
 
@@ -111,7 +113,7 @@ agents_tree_skip: []
 ---
 ```
 
-The metadata gives agents and tools enough information to ask: "Is this knowledge still valid, or should I inspect the code again?"
+The metadata gives agents and tools enough information to ask: "Is this guidance still valid, or should I inspect the code again?"
 
 Generated sections should also include a short visible `Knowledge Status` section so ordinary `AGENTS.md` readers can notice when to re-check.
 
@@ -119,7 +121,7 @@ Agents Tree metadata belongs in maintained decision-guidance artifacts: native `
 
 ## Freshness States
 
-Agents Tree classifies knowledge into three states:
+Agents Tree classifies generated guidance into three states:
 
 - `VALID`: no relevant evidence changed since `last_verified_commit`
 - `STALE_WARNING`: relevant evidence changed, but the module shape appears mostly intact
@@ -129,11 +131,11 @@ The exact classifier should combine Git diffs with optional code graph, code-int
 
 ## Managed Sections
 
-Agents Tree treats generated knowledge and human notes differently.
+Agents Tree treats generated guidance and human notes differently.
 
 ```md
 <!-- agents-tree:generated:start -->
-Generated module knowledge lives here.
+Generated module guidance lives here.
 <!-- agents-tree:generated:end -->
 
 <!-- agents-tree:human:start -->
@@ -180,6 +182,8 @@ skills/agents-tree/
 
 Create a guidance file only where it earns its keep. In native mode this is an `AGENTS.md`; in sidecar mode this is the selected sidecar file, such as `decision-router.md`.
 
+The traits below are prompts for investigation, not a creation checklist. Before adding a file, the agent should state the specific decision cost it will save.
+
 Good candidates include directories with:
 
 - many files
@@ -189,23 +193,23 @@ Good candidates include directories with:
 - historical compatibility logic
 - frequent agent access
 
-Root files should stay short and point agents toward the right subtree. Leaf files may carry more concrete implementation knowledge.
+Root files should stay short and point agents toward the right subtree. Leaf files may carry more concrete implementation guidance.
 
 ## Freshness Review
 
 Freshness can be reviewed manually or by an agent during normal work.
 
-The reviewer reads metadata, compares the recorded evidence against the current code, and classifies the knowledge:
+The reviewer reads metadata, compares the recorded evidence against the current code, and classifies the guidance:
 
-- `VALID`: the recorded evidence still supports the knowledge.
-- `STALE_WARNING`: something changed and the knowledge may need a partial update.
-- `INVALID`: the knowledge must not be trusted until the code is inspected again.
+- `VALID`: the recorded evidence still supports the guidance.
+- `STALE_WARNING`: something changed and the guidance may need a partial update.
+- `INVALID`: the guidance must not be trusted until the code is inspected again.
 
-An agent may use Git diffs, code graph tools, code-intelligence tools, language-server data, or direct code reads to perform this review. The important part is not the tool; it is that stale knowledge is not silently trusted.
+An agent may use Git diffs, code graph tools, code-intelligence tools, language-server data, or direct code reads to perform this review. The important part is not the tool; it is that stale guidance is not silently trusted.
 
 ## Refresh Workflow
 
-When knowledge needs an update:
+When generated guidance needs an update:
 
 - inspect the relevant code evidence
 - update only the generated section
@@ -215,7 +219,7 @@ When knowledge needs an update:
 
 ## Conflict Blocks
 
-If generated knowledge conflicts with a human-maintained section, the agent should record the conflict in the file instead of overwriting either side:
+If generated guidance conflicts with a human-maintained section, the agent should record the conflict in the file instead of overwriting either side:
 
 ```md
 <!-- agents-tree:conflict:start -->
@@ -228,7 +232,7 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 <!-- agents-tree:conflict:end -->
 ```
 
-An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
+An unresolved conflict blocks guidance maintenance for that `AGENTS.md` file and its subtree. It does not block unrelated code work or unrelated tree nodes.
 
 The marker is machine-readable, but the body must also be clear to humans and agents that have not installed Agents Tree.
 
@@ -303,13 +307,13 @@ Root-level files should behave like indexes. Leaf-level files may include implem
 ## Design Principles
 
 - Prefer trustworthy short context over exhaustive documentation.
-- Keep root knowledge abstract and leaf knowledge concrete.
+- Keep root guidance abstract and leaf guidance concrete.
 - Prefer task-routing and first-hop rules over directory summaries.
 - Keep only generated bullets that change the next action.
 - Make skip guidance concrete: if the task is only X, go to Y or query Z instead.
-- Do not duplicate parent knowledge in child files.
+- Do not duplicate parent guidance in child files.
 - Record evidence for every generated claim.
-- Treat stale knowledge as worse than missing knowledge.
+- Treat stale guidance as worse than missing guidance.
 - Preserve human-maintained notes during agent-driven refresh.
 - Use code-intelligence tools for facts; use the selected guidance artifact for agent-facing decisions.
 

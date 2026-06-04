@@ -49,7 +49,8 @@ Answer:
 2. Which artifact should receive generated decision-guidance updates?
 3. What must not be added to `src/payments/AGENTS.md`?
 4. What should happen if native and sidecar guidance overlap in the same directory?
-5. Which code-intelligence query target would you seek before editing across the API boundary?
+5. What should happen if native and sidecar generated guidance overlap by ancestry across the same covered subtree?
+6. Which code-intelligence query target would you seek before editing across the API boundary?
 
 Output:
 

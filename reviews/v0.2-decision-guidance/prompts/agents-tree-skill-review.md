@@ -28,9 +28,10 @@ Review goals:
 7. Are keep/skip rules lightweight and respectful of existing ignore files?
 8. Are cross-module relationships delegated to code graph or code-intelligence tools instead of being stored as durable guidance?
 9. Do generated bullets have to change the next action for a future agent?
-10. Does the skill explain how verified guidance can speed reasoning and reduce reasoning tokens without replacing code reading?
-11. Are there contradictions, repeated rules, vague instructions, or non-executable rules?
-12. Can an agent without this skill still understand conflict and freshness state from generated files?
+10. Does Review Mode tell agents to inspect proposed diffs for deleted or rewritten human-maintained content, not only final file shape?
+11. Does the skill explain how verified guidance can speed reasoning and reduce reasoning tokens without replacing code reading?
+12. Are there contradictions, repeated rules, vague instructions, or non-executable rules?
+13. Can an agent without this skill still understand conflict and freshness state from generated files?
 
 Output format:
 

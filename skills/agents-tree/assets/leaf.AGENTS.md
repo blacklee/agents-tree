@@ -20,7 +20,7 @@ agents_tree_skip: []
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
-<!-- Delete unused generated headings before committing this file. Include implementation details only when they reduce stable task decisions. Delete any bullet that does not change the next action. -->
+<!-- Before committing, replace or delete all placeholders such as COMMIT_SHA, TASK_SHAPE, DECISION_1, SymbolName, and path/to/file. Unresolved placeholders make this guidance invalid. Delete unused generated headings. Include implementation details only when they reduce stable task decisions. Delete any bullet that does not change the next action. -->
 
 ## Decision Compression
 

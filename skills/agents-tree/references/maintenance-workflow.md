@@ -12,7 +12,11 @@ Recommend sidecar mode only when the target project has a clear reason to separa
 
 If sidecar mode is selected, prefer `decision-router.md` as the consistent file name unless the human chooses another name. Ensure root `AGENTS.md` contains a short pointer telling agents to read applicable sidecar files from the repository root to the target directory before broad code inspection. Without that pointer, sidecar guidance is easy to miss.
 
-Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory. If both already exist, stop and ask whether to migrate, merge, or leave them separate.
+Selecting sidecar mode is not permission to edit a human-owned, strict, or unmarked root `AGENTS.md`. If the pointer is missing, ask for explicit approval before adding it. Without approval, report that sidecar guidance may not be reliably discovered.
+
+Discover sidecar files from the repository root that owns the maintained artifact and target code. In nested repositories, package workspaces, or submodules, establish that root before classifying sidecar guidance as `VALID`.
+
+Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory or overlapping ancestor/descendant subtree. If both already exist, stop and ask whether to migrate, merge, intentionally split, or retire one artifact before refreshing either side.
 
 ## When To Add Guidance Files
 
@@ -50,9 +54,9 @@ Consider updating an existing `AGENTS.md` when current work changes stable decis
 - an important directory was added, removed, renamed, or moved
 - the agent found a mismatch between existing guidance and current code evidence
 - the agent repeatedly had to decide where to start or what to ignore because local guidance was missing
-- the user explicitly asked to update, refresh, or record knowledge
+- the user explicitly asked to update, refresh, or record guidance
 
-Do not update the tree for every code change. Small implementation edits that do not change durable project understanding should leave the knowledge tree untouched.
+Do not update the tree for every code change. Small implementation edits that do not change durable project understanding should leave the guidance tree untouched.
 
 ## Tree Shape
 
@@ -122,6 +126,8 @@ Avoid repeated suggestions:
 4. In check-only mode, report suggestions without writing metadata unless the user explicitly asks to record the review state.
 5. In create or refresh mode, record or update `audience_boundary_review` only in the nearest managed guidance artifact.
 
+If `checked_at_commit` is `unknown`, cannot be compared, or any listed file was renamed, deleted, or replaced, report the repeat-suppression state as uncertain and re-run the advisory check. Do not write or rely on `resolved` suppression for the new file set unless it has been reviewed.
+
 Use `status: suggested` after reporting active suggestions, `status: dismissed` when the user declines, and `status: resolved` when no active suggestion remains after review or cleanup.
 
 Do not add YAML front matter to non-`AGENTS.md` docs for this review. If those files already have project-specific front matter, preserve it and leave Agents Tree metadata out of it.
@@ -130,20 +136,24 @@ Do not add YAML front matter to non-`AGENTS.md` docs for this review. If those f
 
 Separate instruction reading from evidence discovery:
 
-1. Read applicable `AGENTS.md` files for instructions and local knowledge; in sidecar mode, also read the sidecar guidance files they point to.
+1. Read applicable `AGENTS.md` files for instructions and local guidance; in sidecar mode, also read the sidecar guidance files they point to.
 2. Apply project ignore files before discovering candidate evidence files.
 3. Apply `agents_tree_skip` after project ignore files.
 4. Apply `agents_tree_keep` only for rare reviewed exceptions.
-5. **MUST** use project-declared code graph or code-intelligence tools before creating, reviewing, or refreshing generated knowledge.
+5. **MUST** attempt project-declared code graph or code-intelligence tools before creating, reviewing, or refreshing generated guidance.
 6. Use focused source reads, relevant tests, Git diffs, and recent history only as needed.
 
-Avoid broad source scans unless the existing knowledge is missing or invalid.
+Avoid broad source scans unless the existing guidance is missing or invalid.
 
-If project guidance or the nearest applicable guidance artifact declares a code-intelligence tool, using it is mandatory for generated knowledge. Use `grep`, `rg`, and raw file reads only as supplementary evidence or when the declared tool is unavailable or stale.
+If project guidance or the nearest applicable guidance artifact declares a code-intelligence tool, attempt it first for generated guidance. Use `grep`, `rg`, and raw file reads only as supplementary evidence or when the declared tool is unavailable or stale.
 
 Use ignore files before applying `agents_tree_skip`. Use `agents_tree_keep` only for a small number of paths that must remain visible despite broad ignore patterns.
 
 `agents_tree_keep` must not reopen secrets, credentials, dependency directories, build outputs, generated artifacts, or vendored code unless a human explicitly asks for that exact path in the current task.
+
+Do not write a current-task keep exception into durable `agents_tree_keep` unless the human explicitly asks to make that exact safe path permanent. A one-time exception belongs in the current response or task evidence notes.
+
+Recorded `critical_files` and `critical_symbols` must be checked even when they match `agents_tree_skip`. If project ignore files or safety rules prevent checking recorded evidence, report `INVALID` or cannot verify instead of treating skipped evidence as unchanged.
 
 If code graph or code-intelligence tools are unavailable, use this bounded sequence:
 
@@ -153,7 +163,7 @@ If code graph or code-intelligence tools are unavailable, use this bounded seque
 4. nearest imports, exports, and type declarations around named symbols
 5. focused textual references for named symbols only
 
-Stop when there is enough evidence to classify freshness, or report that validity cannot be established.
+Stop when there is enough evidence to classify freshness, or report that validity cannot be established. Record unavailable, stale, or partial tool evidence in `Evidence Notes` or the review report. Do not report `VALID` unless every generated claim is fully re-evidenced without the missing tool.
 
 ## Critical Metadata Selection
 
@@ -168,6 +178,8 @@ Before writing or refreshing metadata:
 `critical_symbols` is not a complete function list. For a medium module, prefer about 8-15 high-value symbols unless a strong reason is recorded.
 
 In multi-repo workspaces, compute `last_verified_commit` from the repository containing the target `AGENTS.md`. If a graph index reports a parent or aggregate repository commit, mention it in `Evidence Notes` but do not use it as `last_verified_commit`.
+
+If generated guidance depends on uncommitted working-tree changes, do not advance `last_verified_commit` to `HEAD` as though the commit contains that evidence. Wait for the source changes to be committed, or record a visible working-tree limitation and classify conservatively.
 
 ## Unmarked `AGENTS.md` Migration
 
@@ -204,7 +216,7 @@ When refreshing:
 - verify current code evidence first
 - edit only the generated section
 - preserve human sections byte-for-byte unless the user asks otherwise
-- write or preserve conflict blocks when human and generated knowledge disagree
+- write or preserve conflict blocks when human and generated guidance disagree
 - update metadata only after the generated claims have been checked
 - run a metadata consistency check before reporting completion
 - list any unresolved conflicts in the final response
@@ -233,6 +245,8 @@ When reviewing an `AGENTS.md`, assess whether it reduces future decision cost:
 - Are critical files and symbols precise enough for freshness checks?
 - Does it use declared code-intelligence evidence when that evidence is available?
 
+When reviewing a proposed diff, compare the diff against the previous file, not only the final artifact. Flag deletion, movement, wrapping, or rewriting of unmanaged text or human sections unless the diff includes explicit human approval.
+
 Return a concise token-saving value rating: `HIGH`, `MEDIUM`, or `LOW`.
 
 ## Conflict Handling
@@ -260,6 +274,8 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 
 If a file already has an unresolved conflict block, do not refresh that file or any child guidance file under its directory. Continue with unrelated files when they do not depend on the conflicted subtree.
 
+Before maintenance, parse conflict-block status mechanically. Missing, duplicated, or unrecognized `status` values make the file `INVALID` for guidance maintenance. Treat `status: resolved` as non-blocking only when a short resolution note is present.
+
 Write conflict blocks so they are understandable without this skill installed. The marker is for tools; the visible Markdown body is for humans and ordinary agents.
 
 Conflict blocks may include cross-module context when needed for human judgment. This is an explicit exception to normal guidance-file cohesion. Include impacted modules, relevant neighboring guidance claims, and current graph/search evidence only when they help resolve the conflict.
@@ -280,7 +296,7 @@ If a module split, merge, rename, or move changes directory ownership, classify 
 
 Update the tree shape explicitly after verifying the new scope:
 
-- retire old nodes that no longer own useful knowledge
+- retire old nodes that no longer own useful guidance
 - move or recreate nodes at the new directory boundary
 - create child nodes only where they reduce future reasoning cost
 

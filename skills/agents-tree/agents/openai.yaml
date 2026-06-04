@@ -1,4 +1,4 @@
 interface:
   display_name: "Agents Tree"
-  short_description: "Maintain verified AGENTS.md-compatible decision guidance"
-  default_prompt: "Use $agents-tree to create, check, or refresh this project's decision guidance."
+  short_description: "Maintain and review verified AGENTS.md-compatible decision guidance"
+  default_prompt: "Use $agents-tree to create, check, refresh, or review this project's AGENTS.md-compatible decision guidance while preserving human-maintained sections."

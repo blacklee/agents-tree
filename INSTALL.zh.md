@@ -8,7 +8,7 @@
 skills/agents-tree/
 ```
 
-安装后，skill 会指导 Agent 在目标项目里创建、检查或刷新 `AGENTS.md` 决策压缩树。目标项目里的决策压缩树仍然属于目标项目，和这个 skill 仓库不是同一件东西。
+安装后，skill 会指导 Agent 在目标项目里创建、检查、刷新或评审 `AGENTS.md` 兼容决策指引。目标项目里的决策指引仍然属于目标项目，和这个 skill 仓库不是同一件东西。
 
 ## 安装前确认
 
@@ -54,14 +54,14 @@ cp -R /path/to/agents-tree/skills/agents-tree .agents/skills/agents-tree
 
 然后把 `.agents/skills/agents-tree` 提交到目标项目仓库。
 
-项目级安装会把 skill 放进目标项目；但它维护的 `AGENTS.md` 决策压缩树仍然是目标项目自己的决策压缩树。
+项目级安装会把 skill 放进目标项目；但它维护的 `AGENTS.md` 兼容决策指引仍然是目标项目自己的决策指引。
 
 ## Codex 中如何调用
 
 显式调用：
 
 ```text
-$agents-tree 检查这个仓库是否适合创建 AGENTS.md 决策压缩树，只分析不改文件。
+$agents-tree 检查这个仓库是否适合创建 AGENTS.md 兼容决策指引，只分析不改文件。
 ```
 
 或者：
@@ -107,7 +107,7 @@ Hooks 更适合做强制检查、审计或团队策略，不是这个项目的 M
 
 - 不要只复制 `SKILL.md`；必须连同 `references/` 和 `assets/` 一起复制。
 - 不要把整个 `agents-tree` 仓库当作 skill 目录；应复制里面的 `skills/agents-tree/`。
-- 不要把 `assets/*.AGENTS.md` 直接当作目标项目的最终知识；它们只是模板，仍需 Agent 按代码证据生成内容。
+- 不要把 `assets/*.AGENTS.md` 直接当作目标项目的最终指引；它们只是模板，仍需 Agent 按代码证据生成内容。
 - 不要为了触发 skill 先配置 hooks；先用显式 `$agents-tree` 调用验证。
 
 ## 安装后自检
@@ -115,7 +115,7 @@ Hooks 更适合做强制检查、审计或团队策略，不是这个项目的 M
 可以用下面的提示测试安装是否生效：
 
 ```text
-$agents-tree 只分析当前项目：哪些目录适合建立 AGENTS.md 决策压缩树？不要修改文件。
+$agents-tree 只分析当前项目：哪些目录适合建立 AGENTS.md 兼容决策指引？不要修改文件。
 ```
 
 理想行为：

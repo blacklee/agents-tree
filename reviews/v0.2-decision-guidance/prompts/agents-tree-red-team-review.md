@@ -32,8 +32,9 @@ Prioritize risks around:
 
 - pre-existing or malformed native `AGENTS.md`
 - sidecar `decision-router.md` mode and root pointer discovery
-- overlap between native guidance and sidecar guidance
+- overlap between native guidance and sidecar guidance, including ancestor/descendant overlap
 - human-maintained text protection
+- proposed diffs that delete, move, wrap, or rewrite human-maintained text
 - freshness classification and `last_verified_commit`
 - missing critical files or symbols
 - conflict blocks
