@@ -90,7 +90,7 @@ Allow negative guidance when it saves reasoning tokens, such as "do not start fr
 Run this lightweight advisory check when the target directory contains both:
 
 - human-facing docs, such as `README.md`, install docs, usage docs, or contribution docs
-- agent-facing docs, such as `AGENTS.md`, `CLAUDE.md`, `agents/claude.md`, or other coding-agent instruction files
+- agent-facing docs, such as cross-agent `AGENTS.md`, tool-specific `CLAUDE.md` / `agents/claude.md`, or other coding-agent instruction files
 
 Review only the reader boundary:
 
@@ -98,7 +98,7 @@ Review only the reader boundary:
 - Agent-facing docs should guide agent actions: first hops, code-intelligence requirements, skip rules, boundary checks, verification choice, and links to human docs when context is needed.
 - Shared facts may appear in both places only when expressed for different readers.
 
-Report likely misplaced information as suggestions. Do not move or rewrite `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs unless the user explicitly asks for that edit.
+Report likely misplaced information as suggestions. Do not move or rewrite human-facing docs such as `README.md` or tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md` unless the user explicitly asks for that edit.
 
 Avoid repeated suggestions:
 

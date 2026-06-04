@@ -52,7 +52,7 @@ Before writing or refreshing `critical_symbols`, verify each entry resolves to a
 
 ### Optional Audience Boundary Metadata
 
-When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md`, a managed `AGENTS.md` may record that the audience-boundary review has already been suggested, dismissed, or resolved:
+When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` / `agents/claude.md`, a managed `AGENTS.md` may record that the audience-boundary review has already been suggested, dismissed, or resolved:
 
 ```yaml
 audience_boundary_review:
@@ -76,9 +76,9 @@ This metadata is advisory. It does not make the `AGENTS.md` stale or invalid by 
 
 Agents Tree YAML front matter belongs only in maintained `AGENTS.md` files.
 
-Do not add Agents Tree front matter or Agents Tree metadata to `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs. If those files already use front matter for a site generator, documentation tool, or local convention, preserve it and do not add Agents Tree fields there.
+Do not add Agents Tree front matter or Agents Tree metadata to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`, or any file that is not a maintained `AGENTS.md`. If those files already use front matter for a site generator, documentation tool, or local convention, preserve it and do not add Agents Tree fields there.
 
-If an audience-boundary review needs persistent state, record it in the nearest managed `AGENTS.md`, not in the human-facing or tool-specific doc.
+If an audience-boundary review needs persistent state, record it in the nearest managed `AGENTS.md`, not in the human-facing doc or tool-specific agent doc.
 
 ## Managed Sections
 

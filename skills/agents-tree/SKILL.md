@@ -13,7 +13,7 @@ This skill is only the maintenance workflow. The decision-compression tree belon
 
 Generated `AGENTS.md` files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
 
-When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md`, this skill may review whether information is placed for the right reader. This is an advisory audience-boundary check, not general documentation cleanup.
+When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` / `agents/claude.md`, this skill may review whether information is placed for the right reader. This is an advisory audience-boundary check, not general documentation cleanup.
 
 ## Decision Compression Value
 
@@ -87,14 +87,14 @@ Do not update the tree for every code change. Update it only when the change aff
 - Preserve unmanaged text outside managed sections as human-maintained content.
 - `owner: human-maintained` blocks all edits to the file unless the user explicitly asks to edit that human-owned file.
 - Before refreshing a child `AGENTS.md`, check applicable ancestors for unresolved conflict blocks that cover the target path.
-- Do not add Agents Tree YAML front matter to `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs. Preserve existing front matter in those files if the project already uses it, but do not add Agents Tree metadata there.
+- Do not add Agents Tree YAML front matter to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`, or any file that is not a maintained `AGENTS.md`. Preserve existing front matter in those files if the project already uses it, but do not add Agents Tree metadata there.
 
 ## Audience Boundary Review
 
 Use this lightweight check when a directory contains both human-facing docs and agent-facing docs:
 
 - Human-facing docs include `README.md` and similar onboarding, product, install, usage, or contribution docs.
-- Agent-facing docs include `AGENTS.md`, `CLAUDE.md`, `agents/claude.md`, and other coding-agent instruction files.
+- Agent-facing docs include cross-agent `AGENTS.md`, tool-specific `CLAUDE.md` / `agents/claude.md`, and other coding-agent instruction files.
 - Human-facing docs should explain the project to people.
 - Agent-facing docs should guide agent actions: first hops, tool requirements, skip rules, boundary checks, verification choice, and where to find human context.
 

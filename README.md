@@ -60,7 +60,7 @@ It is designed around six constraints:
 - **Agent compatibility**: the output is ordinary `AGENTS.md`, so existing agents can consume it without a new runtime.
 - **Skill-based maintenance**: the reusable part is the agent workflow; the generated knowledge stays inside the target repository.
 
-Agents Tree may also report lightweight audience-boundary suggestions when human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md` or `CLAUDE.md` coexist in one directory. This is advisory: it helps keep human onboarding content and agent decision guidance in the right place, but it does not turn Agents Tree into a general README maintenance tool.
+Agents Tree may also report lightweight audience-boundary suggestions when human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` coexist in one directory. This is advisory: it helps keep human onboarding content and agent decision guidance in the right place, but it does not turn Agents Tree into a general README maintenance tool.
 
 ## Knowledge Metadata
 
@@ -90,7 +90,7 @@ The metadata gives agents and tools enough information to ask: "Is this knowledg
 
 Generated sections should also include a short visible `Knowledge Status` section so ordinary `AGENTS.md` readers can notice when to re-check.
 
-Agents Tree metadata belongs in maintained `AGENTS.md` files. Do not add Agents Tree YAML front matter to `README.md`, `CLAUDE.md`, or other non-`AGENTS.md` docs unless the project already uses its own front matter there, and even then do not add Agents Tree fields.
+Agents Tree metadata belongs in maintained `AGENTS.md` files. Do not add Agents Tree YAML front matter to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md`, or any file that is not a maintained `AGENTS.md` unless the project already uses its own front matter there, and even then do not add Agents Tree fields.
 
 ## Freshness States
 

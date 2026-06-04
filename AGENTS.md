@@ -26,7 +26,7 @@ Before adding implementation code or automation, preserve the product contract d
 - compatibility with existing `AGENTS.md`-aware agents
 - optional integration with code-intelligence tools
 - generated content focused on task routing, first-hop rules, skip guidance, boundary checks, and verification hints
-- advisory audience-boundary checks between human-facing docs and agent-facing docs, without turning this into a general README maintenance tool
+- advisory audience-boundary checks among human-facing docs, cross-agent `AGENTS.md`, and tool-specific agent docs, without turning this into a general README maintenance tool
 
 ## Architecture Direction
 
@@ -53,7 +53,7 @@ Avoid adding servers, dashboards, embeddings, databases, background daemons, or 
 
 Generated `AGENTS.md` files should use YAML front matter for knowledge metadata.
 
-Agents Tree front matter belongs only in maintained `AGENTS.md` files. Do not add Agents Tree metadata to `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs.
+Agents Tree front matter belongs only in maintained `AGENTS.md` files. Do not add Agents Tree metadata to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`, or any file that is not a maintained `AGENTS.md`.
 
 Expected metadata fields:
 
@@ -142,7 +142,7 @@ Conflict blocks should use relative Markdown links for known files and related `
 - Do not generate large root-level knowledge dumps.
 - Do not treat unchanged files as proof that dependent symbols or flows are unchanged.
 - Do not claim knowledge is valid without checking its recorded evidence.
-- Do not rewrite README, CLAUDE, or other non-`AGENTS.md` docs during audience-boundary review unless the user explicitly asks.
+- Do not rewrite human-facing docs such as README or tool-specific agent docs such as CLAUDE during audience-boundary review unless the user explicitly asks.
 
 ## Verification
 
