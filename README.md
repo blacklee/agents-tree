@@ -22,13 +22,13 @@ Large repositories make coding agents repeatedly pay for the same work:
 
 Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated decision-making about where to inspect, what to query, which boundaries to check, and what to ignore first.
 
-It does that by guiding an agent to maintain a tree of `AGENTS.md` files across the target repository. Root files stay short and act like indexes. Lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
+It does that by guiding an agent to maintain a small decision-guidance layer across the target repository. By default that layer is a tree of `AGENTS.md` files: root files stay short and act like indexes, while lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
 
 ## Core Idea
 
 Agents already know how to read `AGENTS.md`.
 
-Agents Tree builds on that existing behavior instead of introducing a separate memory system. Each directory in the target project can contain an `AGENTS.md` file that describes only the stable decision guidance relevant to that subtree.
+Agents Tree builds on that existing behavior instead of introducing a separate memory system. Each important directory in the target project can contain an `AGENTS.md` file that describes only the stable decision guidance relevant to that subtree.
 
 ```text
 project/
@@ -45,7 +45,22 @@ project/
 
 Higher files answer "where should the agent go next?" Lower files answer "what first hop, boundary check, skip rule, or verification hint matters before editing here?"
 
-The skill itself is not the target tree. It is the maintenance workflow. The tree belongs to the project being worked on, is committed with that project, and remains useful even when Agents Tree is not installed.
+The skill itself is not the target guidance layer. It is the maintenance workflow. The guidance belongs to the project being worked on, is committed with that project, and remains useful even when Agents Tree is not installed.
+
+## Artifact Strategy
+
+Use native `AGENTS.md` mode by default. It has the lowest learning cost because coding agents already know how to discover and apply `AGENTS.md` files.
+
+Use a sidecar decision-router tree only when the target project intentionally wants to keep agent behavior instructions separate from decision guidance. For example, a project may already have strict `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md` files for tool behavior, and may not want generated routing guidance mixed into those files.
+
+In sidecar mode, use one consistent file name such as `decision-router.md` across the tree, and keep a short root `AGENTS.md` entry that tells agents when and how to read it:
+
+```md
+For Agents Tree decision guidance, read applicable `decision-router.md`
+files from the repository root to the target directory before broad code inspection.
+```
+
+Sidecar mode is a trade-off. It keeps instruction files cleaner, but it depends on the root `AGENTS.md` pointer for discovery. Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory unless a human explicitly asks to migrate or resolve the overlap.
 
 ## What Makes It Different
 
@@ -57,14 +72,14 @@ It is designed around six constraints:
 - **Directory scope**: knowledge follows the same tree as the source code.
 - **Freshness checks**: every generated knowledge file records what code evidence it was verified against.
 - **Human review**: generated sections are reviewable diffs, and human-maintained sections are protected.
-- **Agent compatibility**: the output is ordinary `AGENTS.md`, so existing agents can consume it without a new runtime.
+- **Agent compatibility**: the default output is ordinary `AGENTS.md`; optional sidecar mode still routes through a short root `AGENTS.md` pointer.
 - **Skill-based maintenance**: the reusable part is the agent workflow; the generated knowledge stays inside the target repository.
 
 Agents Tree may also report lightweight audience-boundary suggestions when human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` coexist in one directory. This is advisory: it helps keep human onboarding content and agent decision guidance in the right place, but it does not turn Agents Tree into a general README maintenance tool.
 
 ## Knowledge Metadata
 
-Each generated `AGENTS.md` starts with YAML front matter:
+Each generated native `AGENTS.md` starts with YAML front matter:
 
 ```yaml
 ---
@@ -90,7 +105,7 @@ The metadata gives agents and tools enough information to ask: "Is this knowledg
 
 Generated sections should also include a short visible `Knowledge Status` section so ordinary `AGENTS.md` readers can notice when to re-check.
 
-Agents Tree metadata belongs in maintained `AGENTS.md` files. Do not add Agents Tree YAML front matter to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md`, or any file that is not a maintained `AGENTS.md` unless the project already uses its own front matter there, and even then do not add Agents Tree fields.
+Agents Tree metadata belongs in maintained decision-guidance artifacts: native `AGENTS.md` files, or explicit sidecar files such as `decision-router.md` when the project has chosen sidecar mode. Do not add Agents Tree YAML front matter to human-facing docs such as `README.md` or tool-specific agent docs such as `CLAUDE.md` unless the project already uses its own front matter there, and even then do not add Agents Tree fields.
 
 ## Freshness States
 
@@ -125,8 +140,8 @@ Agents Tree does not require a dedicated CLI.
 
 The primary workflow is skill-driven, conversational, and file-based:
 
-- A human asks an agent using the Agents Tree skill to create or update the target project's `AGENTS.md` tree.
-- The agent reads the existing tree, inspects only the needed code evidence, and proposes focused changes.
+- A human asks an agent using the Agents Tree skill to create or update the target project's decision guidance.
+- The agent reads the existing native `AGENTS.md` tree or selected sidecar tree, inspects only the needed code evidence, and proposes focused changes.
 - The human reviews the resulting Git diff.
 - Human-maintained sections remain protected during agent updates.
 
@@ -149,11 +164,11 @@ skills/agents-tree/
     └── leaf.AGENTS.md
 ```
 
-`SKILL.md` stays concise so agents can load it cheaply. References hold detailed rules. Assets provide templates that agents can copy into target projects.
+`SKILL.md` stays concise so agents can load it cheaply. References hold detailed rules. Assets provide native `AGENTS.md` templates that agents can copy into target projects.
 
 ## When To Add Files
 
-Create an `AGENTS.md` file only where it earns its keep.
+Create a guidance file only where it earns its keep. In native mode this is an `AGENTS.md`; in sidecar mode this is the selected sidecar file, such as `decision-router.md`.
 
 Good candidates include directories with:
 
@@ -286,7 +301,7 @@ Root-level files should behave like indexes. Leaf-level files may include implem
 - Record evidence for every generated claim.
 - Treat stale knowledge as worse than missing knowledge.
 - Preserve human-maintained notes during agent-driven refresh.
-- Use code-intelligence tools for facts; use `AGENTS.md` for agent-facing guidance.
+- Use code-intelligence tools for facts; use the selected guidance artifact for agent-facing decisions.
 
 ## Relationship To Other Tools
 
@@ -296,7 +311,7 @@ Agents Tree can work alongside repo-map and memory tools.
 - Memory tools preserve cross-session facts and decisions.
 - Agents Tree routes agents through verified, directory-scoped decision guidance.
 
-The intended role is not to replace those systems, but to give agents a reusable skill for maintaining a simple, reviewable `AGENTS.md` decision-compression tree inside any project.
+The intended role is not to replace those systems, but to give agents a reusable skill for maintaining simple, reviewable decision guidance inside any project. Native `AGENTS.md` mode is the default; sidecar decision-router mode exists only when a project explicitly wants that separation.
 
 Common companion tools include:
 

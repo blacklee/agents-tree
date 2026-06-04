@@ -1,6 +1,20 @@
 # Agents Tree Maintenance Workflow
 
-## When To Add `AGENTS.md`
+## Choose Artifact Strategy First
+
+Use native `AGENTS.md` mode by default. It preserves automatic discovery and keeps learning cost low.
+
+Recommend sidecar mode only when the target project has a clear reason to separate decision guidance from agent behavior instructions:
+
+- existing `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md` files are strict tool instructions that should remain small and human-owned
+- the team explicitly wants generated decision guidance in separate reviewable files
+- the project is migrating from mixed instruction files and wants a clean boundary
+
+If sidecar mode is selected, prefer `decision-router.md` as the consistent file name unless the human chooses another name. Ensure root `AGENTS.md` contains a short pointer telling agents to read applicable sidecar files from the repository root to the target directory before broad code inspection. Without that pointer, sidecar guidance is easy to miss.
+
+Do not create both native `AGENTS.md` guidance and sidecar guidance for the same directory. If both already exist, stop and ask whether to migrate, merge, or leave them separate.
+
+## When To Add Guidance Files
 
 Add a file only when it will reduce future agent decision cost.
 
@@ -12,9 +26,9 @@ Good candidates are directories where generated guidance can reliably answer at 
 - which focused verification usually proves the local change
 - which nearby files or subtrees are tempting but usually irrelevant for a task shape
 
-Directory size is only supporting evidence. A large directory without stable routing value should not get a child `AGENTS.md`. A small directory may deserve one when it repeatedly forces agents to choose between entry-layer, rule-layer, transport-layer, or verification-layer evidence.
+Directory size is only supporting evidence. A large directory without stable routing value should not get a child guidance file. A small directory may deserve one when it repeatedly forces agents to choose between entry-layer, rule-layer, transport-layer, or verification-layer evidence.
 
-Before creating a child `AGENTS.md`, state the decision-compression reason:
+Before creating a child guidance file, state the decision-compression reason:
 
 - first-hop guidance avoided
 - code-intelligence target clarified
@@ -24,7 +38,7 @@ Before creating a child `AGENTS.md`, state the decision-compression reason:
 
 If none applies, do not create the file.
 
-Do not add an `AGENTS.md` for directories whose responsibilities and first-hop evidence are obvious from nearby names, tests, or existing parent guidance.
+Do not add a guidance file for directories whose responsibilities and first-hop evidence are obvious from nearby names, tests, or existing parent guidance.
 
 ## When To Update Existing Knowledge
 
@@ -53,18 +67,18 @@ Generated content should work as a decision map, not an encyclopedia. It should 
 
 Every generated bullet must pass the next-action test: would this bullet change what the next agent reads, queries, cross-checks, skips, or verifies? If not, delete it.
 
-For flat directories with many large files, create one route-oriented `AGENTS.md` first. Do not create file-level `AGENTS.md` files unless the code is reorganized into real subdirectories. If the directory remains too broad for useful local guidance, recommend code-structure refactoring separately from knowledge-tree maintenance.
+For flat directories with many large files, create one route-oriented guidance file first. Do not create file-level guidance files unless the code is reorganized into real subdirectories. If the directory remains too broad for useful local guidance, recommend code-structure refactoring separately from guidance maintenance.
 
 ## Cross-Module Handoff
 
-Use `AGENTS.md` to tell agents when cross-module reasoning is needed and which code-intelligence target to start from, not to store every relationship.
+Use maintained guidance files to tell agents when cross-module reasoning is needed and which code-intelligence target to start from, not to store every relationship.
 
 When work crosses a module boundary:
 
-1. Start from the current module's nearest `AGENTS.md`.
+1. Start from the current module's nearest applicable guidance artifact.
 2. Use a code graph, code-intelligence, structural search, or language-aware navigation tool to find current callers, callees, references, and impact.
-3. Read the nearest `AGENTS.md` for any impacted module before editing across that boundary.
-4. Update `AGENTS.md` only when the cross-module rule is durable, such as "inspect downstream consumers before changing this response shape."
+3. Read the nearest applicable guidance artifact for any impacted module before editing across that boundary.
+4. Update guidance only when the cross-module rule is durable, such as "inspect downstream consumers before changing this response shape."
 
 Do not write lists of current callers, imports, references, or consumers into `AGENTS.md` unless they are intentionally stable architectural contracts.
 
@@ -102,11 +116,11 @@ Report likely misplaced information as suggestions. Do not move or rewrite human
 
 Avoid repeated suggestions:
 
-1. Check the nearest managed `AGENTS.md` for `audience_boundary_review`.
+1. Check the nearest managed guidance artifact for `audience_boundary_review`.
 2. If `status` is `suggested`, `dismissed`, or `resolved`, and all listed files have not changed since `checked_at_commit`, do not repeat the same suggestion.
 3. Re-run the review when any listed file changed since `checked_at_commit`, the reviewed file set changed, or the user explicitly asks.
 4. In check-only mode, report suggestions without writing metadata unless the user explicitly asks to record the review state.
-5. In create or refresh mode, record or update `audience_boundary_review` only in the nearest managed `AGENTS.md`.
+5. In create or refresh mode, record or update `audience_boundary_review` only in the nearest managed guidance artifact.
 
 Use `status: suggested` after reporting active suggestions, `status: dismissed` when the user declines, and `status: resolved` when no active suggestion remains after review or cleanup.
 
@@ -116,7 +130,7 @@ Do not add YAML front matter to non-`AGENTS.md` docs for this review. If those f
 
 Separate instruction reading from evidence discovery:
 
-1. Read applicable `AGENTS.md` files for instructions and local knowledge.
+1. Read applicable `AGENTS.md` files for instructions and local knowledge; in sidecar mode, also read the sidecar guidance files they point to.
 2. Apply project ignore files before discovering candidate evidence files.
 3. Apply `agents_tree_skip` after project ignore files.
 4. Apply `agents_tree_keep` only for rare reviewed exceptions.
@@ -125,7 +139,7 @@ Separate instruction reading from evidence discovery:
 
 Avoid broad source scans unless the existing knowledge is missing or invalid.
 
-If project guidance or the nearest applicable `AGENTS.md` declares a code-intelligence tool, using it is mandatory for generated knowledge. Use `grep`, `rg`, and raw file reads only as supplementary evidence or when the declared tool is unavailable or stale.
+If project guidance or the nearest applicable guidance artifact declares a code-intelligence tool, using it is mandatory for generated knowledge. Use `grep`, `rg`, and raw file reads only as supplementary evidence or when the declared tool is unavailable or stale.
 
 Use ignore files before applying `agents_tree_skip`. Use `agents_tree_keep` only for a small number of paths that must remain visible despite broad ignore patterns.
 
@@ -204,7 +218,7 @@ After refresh, verify:
 - every `critical_files` path exists
 - every `critical_symbols` entry resolves
 - generated claims still fit the module scope
-- parent `AGENTS.md` claims do not contradict this file
+- parent guidance claims do not contradict this file
 - `last_verified_commit` matches the target repository, not an unrelated parent or aggregate repository
 
 ## Review Mode
@@ -228,7 +242,7 @@ Treat these as conflicts:
 - human text says a module owns one responsibility, but code evidence shows another
 - generated text would reverse or weaken a human rule
 - a critical file or symbol disappeared
-- parent and child `AGENTS.md` files give incompatible instructions
+- parent and child guidance files give incompatible instructions
 - a module split, merge, rename, or move changes the tree scope
 
 Do not resolve conflicts silently. Record the exact file, competing claims, and code evidence in an `agents-tree:conflict` block.
@@ -244,11 +258,11 @@ Do not rely on this file as authoritative guidance for this directory or its sub
 <!-- agents-tree:conflict:end -->
 ```
 
-If a file already has an unresolved conflict block, do not refresh that file or any child `AGENTS.md` under its directory. Continue with unrelated files when they do not depend on the conflicted subtree.
+If a file already has an unresolved conflict block, do not refresh that file or any child guidance file under its directory. Continue with unrelated files when they do not depend on the conflicted subtree.
 
 Write conflict blocks so they are understandable without this skill installed. The marker is for tools; the visible Markdown body is for humans and ordinary agents.
 
-Conflict blocks may include cross-module context when needed for human judgment. This is an explicit exception to normal `AGENTS.md` cohesion. Include impacted modules, relevant neighboring `AGENTS.md` claims, and current graph/search evidence only when they help resolve the conflict.
+Conflict blocks may include cross-module context when needed for human judgment. This is an explicit exception to normal guidance-file cohesion. Include impacted modules, relevant neighboring guidance claims, and current graph/search evidence only when they help resolve the conflict.
 
 Use relative Markdown links in conflict blocks for known files, tests, and `AGENTS.md` nodes so humans can jump directly to evidence. Do not invent links or broaden the scan only to add links.
 
@@ -258,11 +272,11 @@ Examples:
 - It does not block refreshing `src/search/AGENTS.md`.
 - It does not block ordinary code edits under `src/payments/`, but agents must inspect source evidence directly instead of relying on the conflicted guidance.
 
-Before refreshing any child `AGENTS.md`, read applicable ancestor `AGENTS.md` files and stop if an unresolved ancestor conflict covers the target path.
+Before refreshing any child guidance file, read applicable ancestor guidance files and stop if an unresolved ancestor conflict covers the target path.
 
 ## Scope Moves
 
-If a module split, merge, rename, or move changes directory ownership, classify affected `AGENTS.md` files as `INVALID` first.
+If a module split, merge, rename, or move changes directory ownership, classify affected guidance files as `INVALID` first.
 
 Update the tree shape explicitly after verifying the new scope:
 

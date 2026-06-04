@@ -2,11 +2,11 @@
 
 ## Project Purpose
 
-This project builds a skill for maintaining verified `AGENTS.md` decision guidance in other projects.
+This project builds a skill for maintaining verified AGENTS.md-compatible decision guidance in other projects.
 
 The product should help agents reduce repeated task-routing and architecture reasoning by teaching them how to maintain directory-scoped decision guidance with freshness metadata.
 
-The Agents Tree skill is not the target decision guidance. The skill is the reusable maintenance workflow. The maintained `AGENTS.md` guidance belongs to the target repository where the skill is applied.
+The Agents Tree skill is not the target decision guidance. The skill is the reusable maintenance workflow. The maintained guidance belongs to the target repository where the skill is applied.
 
 Do not frame this project as a generic memory system. Its core identity is:
 
@@ -20,10 +20,11 @@ The repository is in the early design stage.
 
 Before adding implementation code or automation, preserve the product contract described in `README.md`:
 
-- a reusable skill for maintaining directory-scoped `AGENTS.md` files in target repositories
+- a reusable skill for maintaining directory-scoped decision guidance in target repositories
 - metadata-backed freshness checks
 - generated and human-maintained section boundaries
 - compatibility with existing `AGENTS.md`-aware agents
+- native `AGENTS.md` mode by default, with optional sidecar `decision-router.md` mode only when a project explicitly wants behavior instructions separated from decision guidance
 - optional integration with code-intelligence tools
 - generated content focused on task routing, first-hop rules, skip guidance, boundary checks, and verification hints
 - advisory audience-boundary checks among human-facing docs, cross-agent `AGENTS.md`, and tool-specific agent docs, without turning this into a general README maintenance tool
@@ -51,9 +52,9 @@ Avoid adding servers, dashboards, embeddings, databases, background daemons, or 
 
 ## File Contract
 
-Generated `AGENTS.md` files should use YAML front matter for knowledge metadata.
+Generated native `AGENTS.md` files and explicit sidecar decision-guidance files should use YAML front matter for knowledge metadata.
 
-Agents Tree front matter belongs only in maintained `AGENTS.md` files. Do not add Agents Tree metadata to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`, or any file that is not a maintained `AGENTS.md`.
+Agents Tree front matter belongs only in maintained decision-guidance artifacts: native `AGENTS.md` files, or explicit sidecar files such as `decision-router.md` when sidecar mode is selected. Do not add Agents Tree metadata to human-facing docs such as `README.md` or tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`.
 
 Expected metadata fields:
 
@@ -121,7 +122,7 @@ Conflict blocks should use relative Markdown links for known files and related `
 - Generated sections should say when to use the file, when to skip it, where to start, and which code-intelligence target or verification path matters.
 - Every generated bullet should change the next action; delete bullets that only describe the directory.
 - `Skip This File When` guidance should be concrete: if the task is only X, do not read this first; go to Y or query Z.
-- When human-facing docs and agent-facing docs coexist in a directory, report audience-boundary suggestions once and record review state in the nearest managed `AGENTS.md` when edits are allowed.
+- When human-facing docs and agent-facing docs coexist in a directory, report audience-boundary suggestions once and record review state in the nearest managed guidance artifact when edits are allowed.
 - Every generated claim should be traceable to files, symbols, imports, execution flows, or explicit human notes.
 - Stale knowledge should be surfaced clearly instead of silently trusted.
 - `last_verified_commit` should advance only after all recorded critical evidence and relevant current diffs or graph evidence have been checked.

@@ -2,13 +2,39 @@
 
 ## Scope
 
-This contract applies to `AGENTS.md` files maintained in a target project by the Agents Tree skill.
+This contract applies to decision-guidance files maintained in a target project by the Agents Tree skill.
 
-The skill repository is not the target decision-compression tree. The target project owns the generated files.
+The default maintained artifact is native `AGENTS.md`. A project may explicitly choose sidecar mode and use a consistent file such as `decision-router.md` instead. The skill repository is not the target decision guidance. The target project owns the generated files.
+
+## Artifact Strategies
+
+### Native `AGENTS.md` Mode
+
+Native mode is the default. Maintained guidance lives in directory-scoped `AGENTS.md` files, so existing coding agents can discover it with no extra protocol.
+
+Use native mode unless there is a project-specific reason to keep behavior instructions and decision guidance separate.
+
+### Sidecar Decision-Router Mode
+
+Sidecar mode is optional and must be explicit. It is appropriate when a project has strict existing `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md` instruction files and wants generated decision guidance in separate files.
+
+In sidecar mode:
+
+- Use one sidecar name consistently across the tree; prefer `decision-router.md` unless the human chooses another name.
+- Keep a short root `AGENTS.md` pointer that tells agents to read applicable sidecar files from the repository root to the target directory before broad source inspection.
+- Apply this same file contract to sidecar files: front matter, managed sections, freshness metadata, conflict blocks, and review rules.
+- Do not maintain sidecar and native guidance for the same directory unless a human explicitly asks to migrate or resolve the overlap.
+
+Recommended root pointer:
+
+```md
+For Agents Tree decision guidance, read applicable `decision-router.md`
+files from the repository root to the target directory before broad code inspection.
+```
 
 ## Front Matter
 
-Every maintained `AGENTS.md` should begin with YAML front matter:
+Every maintained decision-guidance artifact should begin with YAML front matter:
 
 ```yaml
 ---
@@ -52,7 +78,7 @@ Before writing or refreshing `critical_symbols`, verify each entry resolves to a
 
 ### Optional Audience Boundary Metadata
 
-When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` / `agents/claude.md`, a managed `AGENTS.md` may record that the audience-boundary review has already been suggested, dismissed, or resolved:
+When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` / `agents/claude.md`, a managed guidance artifact may record that the audience-boundary review has already been suggested, dismissed, or resolved:
 
 ```yaml
 audience_boundary_review:
@@ -74,11 +100,11 @@ This metadata is advisory. It does not make the `AGENTS.md` stale or invalid by 
 
 ### Front Matter Boundaries
 
-Agents Tree YAML front matter belongs only in maintained `AGENTS.md` files.
+Agents Tree YAML front matter belongs only in maintained decision-guidance artifacts: native `AGENTS.md` files, or explicit sidecar files such as `decision-router.md` when sidecar mode is selected.
 
-Do not add Agents Tree front matter or Agents Tree metadata to human-facing docs such as `README.md`, tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`, or any file that is not a maintained `AGENTS.md`. If those files already use front matter for a site generator, documentation tool, or local convention, preserve it and do not add Agents Tree fields there.
+Do not add Agents Tree front matter or Agents Tree metadata to human-facing docs such as `README.md` or tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`. If those files already use front matter for a site generator, documentation tool, or local convention, preserve it and do not add Agents Tree fields there.
 
-If an audience-boundary review needs persistent state, record it in the nearest managed `AGENTS.md`, not in the human-facing doc or tool-specific agent doc.
+If an audience-boundary review needs persistent state, record it in the nearest managed guidance artifact, not in the human-facing doc or tool-specific agent doc.
 
 ## Managed Sections
 
@@ -221,7 +247,7 @@ Summarize the current code evidence. Use relative Markdown links for known concr
 
 ## Cross-Module Context
 
-Summarize only the external module knowledge needed for human judgment, including relevant neighboring `AGENTS.md` claims or graph evidence.
+Summarize only the external module knowledge needed for human judgment, including relevant neighboring guidance claims or graph evidence.
 
 ## Required Resolution
 
@@ -233,7 +259,7 @@ An unresolved conflict blocks knowledge-tree maintenance for that `AGENTS.md` fi
 
 After a human resolves the conflict, remove the conflict block or change `status` to `resolved` with a short resolution note.
 
-Conflict blocks must be self-explanatory. Humans and agents that have not installed Agents Tree should still understand that the local `AGENTS.md` guidance is not authoritative until the conflict is resolved.
+Conflict blocks must be self-explanatory. Humans and agents that have not installed Agents Tree should still understand that the local guidance is not authoritative until the conflict is resolved.
 
 Conflict blocks are allowed to include cross-module context because they are human decision records, not ordinary module knowledge. Include only what helps resolve the conflict. Do not use conflict blocks to create permanent dependency maps.
 
@@ -292,8 +318,8 @@ After refresh, run a metadata consistency check:
 
 - every `critical_files` path exists in the target repository
 - every `critical_symbols` entry resolves to a real code symbol
-- generated claims still fit this `AGENTS.md` directory scope
-- parent `AGENTS.md` claims do not contradict this file
-- `last_verified_commit` belongs to the target repository that contains this `AGENTS.md`
+- generated claims still fit this guidance file's directory scope
+- parent guidance claims do not contradict this file
+- `last_verified_commit` belongs to the target repository that contains this guidance artifact
 
-In multi-repo workspaces, `last_verified_commit` must come from the repository containing the `AGENTS.md` file. If a code-intelligence index reports a parent, aggregate, or external repository commit, mention it in `Evidence Notes` but do not use it as `last_verified_commit`.
+In multi-repo workspaces, `last_verified_commit` must come from the repository containing the guidance artifact. If a code-intelligence index reports a parent, aggregate, or external repository commit, mention it in `Evidence Notes` but do not use it as `last_verified_commit`.

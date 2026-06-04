@@ -22,7 +22,7 @@ Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如�
 
 代码图、repo map、语义搜索这类工具可以降低“读代码”的成本。Agents Tree 关注另一部分成本：反复判断下一步该查哪里、该查什么图目标、哪些边界要复核、哪些内容不用先看。
 
-它通过指导 Agent 在目标项目目录中维护一棵 `AGENTS.md` 文件树来解决这个问题。越靠近根目录，内容越像索引；越靠近代码叶子目录，越具体地记录本地第一跳、跳过规则、边界检查和验证路径。
+它通过指导 Agent 在目标项目目录中维护一层很薄的决策指引来解决这个问题。默认情况下，这层指引是一棵 `AGENTS.md` 文件树：越靠近根目录，内容越像索引；越靠近代码叶子目录，越具体地记录本地第一跳、跳过规则、边界检查和验证路径。
 
 ## 核心思路
 
@@ -45,7 +45,22 @@ project/
 
 上层文件回答“Agent 下一步该去哪里看”。下层文件回答“Agent 在这里动代码前，该先查哪个入口、哪个边界、哪个跳过规则或哪个验证”。
 
-这个 skill 自己不是目标树。它只是维护这棵树的方法。决策压缩树保存在目标项目里，跟随目标项目提交、review 和演进；即使没有安装 Agents Tree skill，那些 `AGENTS.md` 文件仍然能被普通 Agent 读取。
+这个 skill 自己不是目标树。它只是维护这层指引的方法。决策压缩指引保存在目标项目里，跟随目标项目提交、review 和演进；即使没有安装 Agents Tree skill，那些 `AGENTS.md` 文件仍然能被普通 Agent 读取。
+
+## 承载策略
+
+默认使用原生 `AGENTS.md` 模式。它的学习成本最低，因为编码 Agent 已经知道如何发现和应用 `AGENTS.md` 文件。
+
+只有当目标项目明确希望把 Agent 行为指令和决策指引分开时，才使用旁路的 decision-router 文件树。例如，一个项目可能已经有严格的 `AGENTS.md`、`CLAUDE.md` 或 `agents/claude.md` 来约束工具行为，不希望把自动生成的任务路由指引混进去。
+
+在旁路模式下，整棵树使用一个一致的文件名，例如 `decision-router.md`，并在根 `AGENTS.md` 里保留一个很短的入口，告诉 Agent 何时以及如何读取它：
+
+```md
+For Agents Tree decision guidance, read applicable `decision-router.md`
+files from the repository root to the target directory before broad code inspection.
+```
+
+旁路模式是一个取舍：它能让指令文件更干净，但发现机制依赖根 `AGENTS.md` 的入口。除非人类明确要求迁移或解决重叠，否则不要在同一目录同时维护原生 `AGENTS.md` 决策指引和旁路决策指引。
 
 ## 和普通 Agent Memory 的区别
 
@@ -57,7 +72,7 @@ Agents Tree 不主打“记住所有东西”。
 - **目录作用域**：知识结构和源码目录结构一致。
 - **新鲜度检测**：每份生成知识都记录它基于哪些代码证据。
 - **人类可审查**：知识更新体现为普通 Git diff。
-- **现有 Agent 兼容**：输出就是普通 `AGENTS.md`，不需要新的运行时。
+- **现有 Agent 兼容**：默认产物就是普通 `AGENTS.md`；可选旁路模式也通过很短的根 `AGENTS.md` 入口来引导。
 - **Skill 维护**：可复用的是维护流程；被维护的知识留在目标项目里。
 
 当同一目录里同时存在 `README.md` 这类人类文档，以及跨 Agent 的 `AGENTS.md`、工具特定的 `CLAUDE.md` 这类 Agent 文档时，Agents Tree 也可以给出轻量的读者边界建议。这只是建议：它帮助人类入口内容和 Agent 决策指引放在合适位置，但不会把 Agents Tree 变成通用 README 维护工具。
@@ -76,7 +91,7 @@ Agent Memory Database
 
 ## 知识元数据
 
-每个生成的 `AGENTS.md` 使用 YAML front matter 记录知识来源：
+每个生成的原生 `AGENTS.md` 使用 YAML front matter 记录知识来源：
 
 ```yaml
 ---
@@ -108,7 +123,7 @@ agents_tree_skip: []
 
 自动生成区也应该包含简短可见的 `Knowledge Status`，让普通 `AGENTS.md` 读者也能知道什么时候需要重新复查。
 
-Agents Tree 元数据只应该写进受管理的 `AGENTS.md`。不要给 `README.md` 这类人类文档、`CLAUDE.md` 这类工具特定 Agent 文档，或任何不是受管理 `AGENTS.md` 的文件添加 Agents Tree YAML front matter；如果这些文件本来就有项目自己的 front matter，也只保留原有用途，不写入 Agents Tree 字段。
+Agents Tree 元数据只应该写进受管理的决策指引文件：原生 `AGENTS.md`，或项目明确选择旁路模式后的 `decision-router.md` 这类文件。不要给 `README.md` 这类人类文档，或 `CLAUDE.md` 这类工具特定 Agent 文档添加 Agents Tree YAML front matter；如果这些文件本来就有项目自己的 front matter，也只保留原有用途，不写入 Agents Tree 字段。
 
 ## 新鲜度状态
 
@@ -143,8 +158,8 @@ Agents Tree 不需要专门的 CLI。
 
 它的核心维护方式是 skill 驱动的对话和文件编辑：
 
-- 人类让使用 Agents Tree skill 的 Agent 创建或更新目标项目里的 `AGENTS.md` 决策压缩树。
-- Agent 读取已有决策压缩树，只检查必要的代码证据，然后提出局部修改。
+- 人类让使用 Agents Tree skill 的 Agent 创建或更新目标项目里的决策指引。
+- Agent 读取已有的原生 `AGENTS.md` 树或选定的旁路树，只检查必要的代码证据，然后提出局部修改。
 - 人类 review 普通 Git diff。
 - Agent 更新时必须保护人工维护区。
 
@@ -167,11 +182,11 @@ skills/agents-tree/
     └── leaf.AGENTS.md
 ```
 
-`SKILL.md` 保持短小，方便 Agent 低成本加载。详细规则放在 `references/`。可复制到目标项目的 `AGENTS.md` 模板放在 `assets/`。
+`SKILL.md` 保持短小，方便 Agent 低成本加载。详细规则放在 `references/`。可复制到目标项目的原生 `AGENTS.md` 模板放在 `assets/`。
 
 ## 什么时候新增文件
 
-只在值得维护知识的目录新增 `AGENTS.md`。
+只在值得维护知识的目录新增决策指引文件。原生模式下是 `AGENTS.md`；旁路模式下是选定的旁路文件，例如 `decision-router.md`。
 
 适合生成的目录通常有这些特征：
 
@@ -304,7 +319,7 @@ AGENTS.md 负责启动本地推理。
 - 自动生成的结论必须能追溯到文件、符号、调用流或人工说明。
 - 过期知识比没有知识更危险。
 - Agent 刷新知识时必须保护人工维护段落。
-- 代码事实交给代码智能工具，`AGENTS.md` 负责给 Agent 提供行动指引。
+- 代码事实交给代码智能工具，选定的决策指引文件负责给 Agent 提供行动指引。
 
 ## 和其他工具的关系
 
@@ -314,7 +329,7 @@ Agents Tree 可以和 repo map、Agent memory、代码图工具一起工作。
 - Memory 工具保存跨会话事实和决策。
 - Agents Tree 给 Agent 提供可验证、目录级的决策指引入口。
 
-它不需要替代这些系统。更好的定位是：提供一个可复用的 Agent skill，让 Agent 能在任意目标项目里维护简单、可审查、可被继续读取的 `AGENTS.md` 决策压缩树。
+它不需要替代这些系统。更好的定位是：提供一个可复用的 Agent skill，让 Agent 能在任意目标项目里维护简单、可审查、可被继续读取的决策指引。原生 `AGENTS.md` 模式是默认；旁路 decision-router 模式只在项目明确需要分离时使用。
 
 常见配套工具包括：
 
