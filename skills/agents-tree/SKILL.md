@@ -1,6 +1,6 @@
 ---
 name: agents-tree
-description: Use when creating, checking, refreshing, or reviewing directory-scoped AGENTS.md decision-compression trees in a target project; when maintaining project decision guidance, freshness metadata, generated sections, human-protected sections, or stale AGENTS.md guidance for coding agents.
+description: Use when creating, checking, refreshing, or reviewing directory-scoped AGENTS.md decision guidance in a target project; when maintaining project decision guidance, freshness metadata, generated sections, human-protected sections, or stale AGENTS.md guidance for coding agents.
 ---
 
 # Agents Tree

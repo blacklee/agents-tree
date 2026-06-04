@@ -2,16 +2,16 @@
 
 ## Project Purpose
 
-This project builds a skill for maintaining verified `AGENTS.md` decision-compression trees in other projects.
+This project builds a skill for maintaining verified `AGENTS.md` decision guidance in other projects.
 
 The product should help agents reduce repeated task-routing and architecture reasoning by teaching them how to maintain directory-scoped decision guidance with freshness metadata.
 
-The Agents Tree skill is not the target decision-compression tree. The skill is the reusable maintenance workflow. The `AGENTS.md` tree belongs to the target repository where the skill is applied.
+The Agents Tree skill is not the target decision guidance. The skill is the reusable maintenance workflow. The maintained `AGENTS.md` guidance belongs to the target repository where the skill is applied.
 
 Do not frame this project as a generic memory system. Its core identity is:
 
 ```text
-Verified AGENTS Tree
+Verified AGENTS.md Guidance
 ```
 
 ## Current Stage

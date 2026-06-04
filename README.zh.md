@@ -1,12 +1,12 @@
 # Agents Tree
 
-面向 Codex、Claude Code、Cursor Agent、opencode 等编码 Agent 的项目决策压缩树维护 skill。
+为 AI Agent 维护经过验证的 `AGENTS.md` 决策指引，加速推理过程，减少推理 token。
 
-Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如何在其他项目里维护一棵 `AGENTS.md` 决策压缩树。那棵文件树属于目标项目，和这个 skill 本身无关。
+Agents Tree 的目标不是再造一个通用记忆系统，而是教 Agent 如何在其他项目里维护目录级、可审查、带新鲜度检查的 `AGENTS.md` 决策指引。那些指引属于目标项目，和这个 skill 本身无关。
 
-换句话说：`agents-tree` 是维护流程，`AGENTS.md` 文件树是被维护的项目决策压缩层。
+换句话说：`agents-tree` 是维护流程，`AGENTS.md` 是默认承载方式，被维护的是项目里的 Agent 决策压缩层。
 
-> 当前状态：早期项目。这个仓库先定义产品方向、文件契约，以及用 skill 在目标项目里维护决策压缩树的工作流。
+> 当前状态：早期项目。这个仓库先定义产品方向、文件契约，以及用 skill 在目标项目里维护 AGENTS.md 兼容决策指引的工作流。
 
 安装方式见：[`INSTALL.zh.md`](INSTALL.zh.md)。
 
@@ -65,7 +65,7 @@ Agents Tree 不主打“记住所有东西”。
 简单说，它更像是：
 
 ```text
-Verified AGENTS Tree
+Verified AGENTS.md Guidance
 ```
 
 不是：

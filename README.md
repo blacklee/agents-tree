@@ -1,12 +1,12 @@
 # Agents Tree
 
-A skill for maintaining verified decision-compression trees for `AGENTS.md`-compatible coding agents.
+A skill for maintaining verified `AGENTS.md` guidance for faster agent decisions and fewer reasoning tokens.
 
-Agents Tree is a skill for coding agents such as Codex, Claude Code, Cursor Agent, and opencode. The skill teaches agents how to create and maintain a directory-scoped, reviewable, freshness-checked `AGENTS.md` decision-compression tree inside another project.
+Agents Tree is a skill for coding agents such as Codex, Claude Code, Cursor Agent, and opencode. The skill teaches agents how to create and maintain directory-scoped, reviewable, freshness-checked `AGENTS.md` decision guidance inside another project.
 
 The goal is simple: let agents spend fewer tokens deciding where to inspect next, and more of their budget making correct changes.
 
-> Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining decision-compression trees inside target projects.
+> Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining AGENTS.md-compatible decision guidance inside target projects.
 
 Installation guide: [`INSTALL.zh.md`](INSTALL.zh.md).
 
