@@ -9,11 +9,9 @@ description: Use when creating, checking, refreshing, or reviewing directory-sco
 
 Maintain verified AGENTS.md-compatible decision guidance inside the target project.
 
-This skill is only the maintenance workflow. The decision guidance belongs to the target repository, is committed there, and must remain useful without this skill installed.
+This skill is the maintenance workflow, not the target guidance itself. Maintained guidance belongs to the target repository, is committed there, and must remain useful without this skill installed.
 
 Generated guidance files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
-
-When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as cross-agent `AGENTS.md` or tool-specific `CLAUDE.md` / `agents/claude.md`, this skill may review whether information is placed for the right reader. This is an advisory audience-boundary check, not general documentation cleanup.
 
 ## Decision Compression Value
 
@@ -35,18 +33,11 @@ Every generated bullet must change the next action for a future agent: what to r
 
 ## Artifact Strategy
 
-Use native `AGENTS.md` mode by default. It is the lowest-friction strategy because coding agents already discover and apply `AGENTS.md`.
-
-Use sidecar mode only when the target project explicitly wants to keep agent behavior instructions separate from decision guidance. Good reasons include strict existing `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md` files, human preference for separation, or a migration from earlier instruction files that must remain untouched.
-
-In sidecar mode:
-
-- Use one consistent file name across the tree; prefer `decision-router.md` unless the human chooses another name.
-- Keep a short root `AGENTS.md` pointer that tells agents to read applicable sidecar files from the repository root to the target directory before broad code inspection.
-- Apply the same metadata, managed-section, freshness, conflict, and decision-compression rules to sidecar files.
-- Do not maintain native `AGENTS.md` guidance and sidecar guidance for the same directory unless the user explicitly asks to migrate or resolve overlap.
-
-Do not choose sidecar mode just because the name is more semantically precise. Native `AGENTS.md` remains the default when compatibility and low learning cost matter most.
+- Use native `AGENTS.md` mode by default.
+- Use sidecar mode only when the target project explicitly wants decision guidance separate from agent behavior instructions.
+- In sidecar mode, prefer one consistent file name such as `decision-router.md` and require a short root `AGENTS.md` pointer to applicable sidecar files.
+- Do not maintain native and sidecar guidance for the same directory unless the user explicitly asks to migrate or resolve overlap.
+- Read `references/file-contract.md` for exact sidecar contract details.
 
 ## Operating Modes
 
@@ -62,12 +53,12 @@ If the user only asks to check, inspect, analyze, or review, do not edit files u
 - User asks to add missing guidance, start a tree, avoid repeated scans, or reduce task-routing decisions: **Create**.
 - User asks whether current knowledge is trustworthy, stale, valid, or safe to use: **Check**.
 - User asks to update, refresh, rewrite generated guidance, or record changed project decision guidance: **Refresh**.
-- User asks to evaluate proposed `AGENTS.md` changes: **Review**.
+- User asks to evaluate proposed guidance changes: **Review**.
 - If wording is ambiguous, choose **Check** and recommend the next action instead of editing.
 
 ## Update Triggers
 
-Consider updating the tree when work changes stable decision guidance that future agents need:
+Consider updating guidance when work changes stable decision guidance that future agents need:
 
 - edited files or symbols listed in `critical_files` or `critical_symbols`
 - changed directory responsibility, entry points, call flows, ownership boundaries, or verification steps
@@ -76,14 +67,14 @@ Consider updating the tree when work changes stable decision guidance that futur
 - repeatedly scanned the same directory because useful routing or skip guidance was missing
 - user explicitly asked to update, refresh, or record project decision guidance
 
-Do not update the tree for every code change. Update it only when the change affects durable guidance future agents should rely on.
+Do not update guidance for every code change. Update it only when the change affects durable guidance future agents should rely on.
 
 ## Workflow
 
 1. Identify the target project and requested mode.
 2. Read the nearest applicable `AGENTS.md` files first; if sidecar mode is selected, also read the applicable sidecar guidance files they point to.
 3. Validate ownership and section markers before editing.
-4. Stop knowledge-tree maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
+4. Stop guidance maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
 5. If applicable project guidance declares a code graph or code-intelligence tool, **MUST** use it before creating, reviewing, or refreshing generated knowledge; use `grep`/`rg` only as supplementary evidence.
 6. Choose artifact strategy: native `AGENTS.md` by default; sidecar only with an explicit project reason and root `AGENTS.md` pointer.
 7. Decide whether the target directory needs a guidance file; state the decision-compression reason before creating a child file.
@@ -96,10 +87,9 @@ Do not update the tree for every code change. Update it only when the change aff
 
 ## Section Safety
 
-- If an existing `AGENTS.md` has no managed markers, treat all existing body text as human-maintained. Preserve it unless the user explicitly asks to normalize it.
-- During initial tree creation, unmarked existing body text may stay outside managed sections; preserve it byte-for-byte and add generated content in managed sections only.
-- Require exactly one well-ordered generated section before refresh. Allow at most one well-ordered human section.
-- In refresh mode, missing, duplicated, nested, or out-of-order markers make the file `INVALID`; do not edit generated content until repaired or explicitly normalized.
+- If an existing guidance artifact has no managed markers, treat all existing body text as human-maintained.
+- During initial creation, preserve unmarked existing body text byte-for-byte unless the user explicitly asks to normalize it.
+- Require valid managed markers before refresh. Missing, duplicated, nested, or out-of-order markers make the file `INVALID`; do not edit generated content until repaired or explicitly normalized.
 - Preserve unmanaged text outside managed sections as human-maintained content.
 - `owner: human-maintained` blocks all edits to the file unless the user explicitly asks to edit that human-owned file.
 - Before refreshing a child guidance file, check applicable ancestors for unresolved conflict blocks that cover the target path.
@@ -107,16 +97,9 @@ Do not update the tree for every code change. Update it only when the change aff
 
 ## Audience Boundary Review
 
-Use this lightweight check when a directory contains both human-facing docs and agent-facing docs:
+When human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md` coexist, report likely audience-boundary issues as suggestions only.
 
-- Human-facing docs include `README.md` and similar onboarding, product, install, usage, or contribution docs.
-- Agent-facing docs include cross-agent `AGENTS.md`, tool-specific `CLAUDE.md` / `agents/claude.md`, and other coding-agent instruction files.
-- Human-facing docs should explain the project to people.
-- Agent-facing docs should guide agent actions: first hops, tool requirements, skip rules, boundary checks, verification choice, and where to find human context.
-
-Do not move or rewrite audience-mismatched content by default. Report concise suggestions and ask for explicit approval before editing docs outside the selected guidance artifacts.
-
-Avoid repeated suggestions. If the nearest managed guidance artifact records an `audience_boundary_review` with `status: suggested`, `dismissed`, or `resolved`, and the reviewed files have not changed since `checked_at_commit`, do not repeat the same suggestion. Re-review only when those files changed or the user explicitly asks.
+Do not move or rewrite audience-mismatched content by default. Avoid repeated suggestions by checking `audience_boundary_review` in the nearest managed guidance artifact. Read `references/maintenance-workflow.md` for the exact repeat-suppression rules.
 
 ## Cross-Module Handoff
 
@@ -127,83 +110,18 @@ When a task touches critical symbols, APIs, data shapes, call flows, ownership b
 1. Use a code graph or code-intelligence tool to find real callers, callees, references, and impact.
 2. If the result points to another module, read that module's nearest applicable guidance artifact before editing across the boundary.
 3. Record only stable handoff guidance, such as which code-intelligence target to inspect before changing an interface.
-4. Do not copy live dependency lists, current callers, or consumer inventories into `AGENTS.md`; those belong in graph/search tools.
+4. Do not copy live dependency lists, current callers, or consumer inventories into guidance; those belong in graph/search tools.
 
-## File Contract
+## File Contract Pointers
 
-Use YAML front matter plus managed sections in maintained decision-guidance artifacts.
+Maintained guidance artifacts use YAML front matter plus managed generated/human sections. Exact metadata fields, marker validation, conflict blocks, sidecar contract rules, and freshness classification live in `references/file-contract.md`.
 
-Required metadata:
+Before writing or refreshing generated content:
 
-```yaml
-knowledge_type: module
-module: ExampleModule
-last_verified_commit: abc123
-critical_files: []
-critical_symbols: []
-confidence: medium
-owner: ai-generated
-```
-
-Managed sections:
-
-```md
-<!-- agents-tree:generated:start -->
-<!-- agents-tree:generated:end -->
-
-<!-- agents-tree:human:start -->
-<!-- agents-tree:human:end -->
-```
-
-Unresolved conflict blocks:
-
-```md
-<!-- agents-tree:conflict:start -->
-status: unresolved
-# Unresolved Agents Tree Conflict
-
-This `AGENTS.md` file contains unresolved project-knowledge conflict.
-
-Do not rely on this file as authoritative guidance for this directory or its subtree until the conflict is resolved.
-<!-- agents-tree:conflict:end -->
-```
-
-If an unresolved conflict block exists, do not refresh that `AGENTS.md` file or its subtree unless the user explicitly asks to resolve the conflict.
-
-Use canonical conflict types from `references/file-contract.md`: `human_generated_mismatch`, `parent_child_mismatch`, `missing_critical_evidence`, or `scope_mismatch`.
-
-Conflict blocks are an exception to normal module cohesion. Include the smallest cross-module context needed for a human to decide, such as impacted modules, relevant neighboring guidance claims, and code graph evidence. Keep ordinary generated sections cohesive and local.
-
-Generated claims must be traceable to files, symbols, imports, execution flows, tests, or explicit human notes.
-
-Before writing `critical_symbols`, verify each entry resolves to a real code symbol using declared code-intelligence tools or focused source evidence. Do not store route names, aliases, approximate labels, or task notes in metadata.
-
-`critical_symbols` is not a function inventory. Include only durable entry points, boundary symbols, or symbols whose change would invalidate local guidance. Prefer about 8-15 symbols for a medium module unless there is a strong reason.
-
-Use short `Evidence Notes` for generated files with multiple claims; name the evidence type used. Do not write live dependency lists.
-
-Generated content should help future agents choose what to read or query next. Prefer task-routing rules, first-hop guidance, skip guidance, cross-module checks, and focused verification hints. Do not duplicate a full API index, method inventory, or dependency graph that search or code-intelligence tools can produce.
-
-## Freshness Labels
-
-- `VALID`: recorded evidence still supports the knowledge.
-- `STALE_WARNING`: relevant evidence changed, but the main module shape appears intact.
-- `INVALID`: critical files, symbols, ownership boundaries, or flows changed enough that agents must not trust the knowledge without rereading code.
-
-Treat stale or invalid knowledge as worse than missing knowledge.
-
-Decision checklist:
-
-- Missing or malformed metadata or markers in a managed file: `INVALID`.
-- Deleted, renamed, moved, or missing critical file or symbol: `INVALID` until re-evidenced; do not remove old metadata until the replacement evidence and scope are verified.
-- Changed critical symbol signature, ownership boundary, entry point, scope, or execution flow: `INVALID`.
-- Changed critical file with the same responsibility and key flows after focused review: `STALE_WARNING`.
-- No relevant recorded evidence or current references/flows changed: `VALID`.
-- Insufficient evidence: report `INVALID` or cannot verify; never report `VALID`.
-
-Advance `last_verified_commit` only after checking every recorded critical file and symbol plus current diffs or graph evidence affecting generated claims.
-
-After refresh, verify metadata consistency: every `critical_files` path exists, every `critical_symbols` entry resolves, generated claims fit the local scope, parent claims do not contradict this file, and `last_verified_commit` belongs to the target repository containing this guidance artifact.
+- verify `critical_files` paths exist and `critical_symbols` resolve to real symbols
+- ensure generated claims are traceable to files, symbols, imports, execution flows, tests, or explicit human notes
+- treat stale or invalid knowledge as worse than missing knowledge
+- advance `last_verified_commit` only after recorded evidence and relevant current diffs or graph evidence have been checked
 
 In Review mode, include a token-saving value rating: `HIGH`, `MEDIUM`, or `LOW`.
 
