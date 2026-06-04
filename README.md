@@ -22,6 +22,16 @@ Large repositories make coding agents repeatedly pay for the same work:
 
 Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated decision-making about where to inspect, what to query, which boundaries to check, and what to ignore first.
 
+That is why short verified guidance can make reasoning faster and spend fewer reasoning tokens. A future agent can read a few decision rules before opening broad source context:
+
+- start from the likely entry point instead of rediscovering it from filenames
+- skip tempting files or subtrees that are usually irrelevant for a task shape
+- query the right symbol, flow, or boundary in a code-intelligence tool first
+- choose a focused verification path instead of guessing a test surface from scratch
+- re-check stale guidance only when recorded evidence says it may no longer be valid
+
+The guidance does not replace code reading. It reduces the number of reasoning turns needed before the agent knows which code to read and which evidence to trust.
+
 It does that by guiding an agent to maintain a small decision-guidance layer across the target repository. By default that layer is a tree of `AGENTS.md` files: root files stay short and act like indexes, while lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
 
 ## Core Idea
@@ -326,4 +336,4 @@ Common companion tools include:
 
 ## License
 
-License has not been selected yet.
+MIT License.
