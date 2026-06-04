@@ -60,6 +60,8 @@ Agents Tree 不主打“记住所有东西”。
 - **现有 Agent 兼容**：输出就是普通 `AGENTS.md`，不需要新的运行时。
 - **Skill 维护**：可复用的是维护流程；被维护的知识留在目标项目里。
 
+当同一目录里同时存在 `README.md` 这类人类文档，以及 `AGENTS.md`、`CLAUDE.md` 这类 Agent 文档时，Agents Tree 也可以给出轻量的读者边界建议。这只是建议：它帮助人类入口内容和 Agent 决策指引放在合适位置，但不会把 Agents Tree 变成通用 README 维护工具。
+
 简单说，它更像是：
 
 ```text
@@ -105,6 +107,8 @@ agents_tree_skip: []
 如果不可信，就不要盲信 `AGENTS.md`，而应该重新扫描代码。
 
 自动生成区也应该包含简短可见的 `Knowledge Status`，让普通 `AGENTS.md` 读者也能知道什么时候需要重新复查。
+
+Agents Tree 元数据只应该写进受管理的 `AGENTS.md`。不要给 `README.md`、`CLAUDE.md` 或其他非 `AGENTS.md` 文档添加 Agents Tree YAML front matter；如果这些文件本来就有项目自己的 front matter，也只保留原有用途，不写入 Agents Tree 字段。
 
 ## 新鲜度状态
 

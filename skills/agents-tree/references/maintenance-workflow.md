@@ -85,6 +85,33 @@ Allow negative guidance when it saves reasoning tokens, such as "do not start fr
 
 `Skip This File When` is required to be specific when present. Do not write vague bullets such as "skip this when the target is already clear" or "skip for unrelated changes." Use the form "If the task is only X, do not read this file first; go to Y or query Z."
 
+## Audience Boundary Review
+
+Run this lightweight advisory check when the target directory contains both:
+
+- human-facing docs, such as `README.md`, install docs, usage docs, or contribution docs
+- agent-facing docs, such as `AGENTS.md`, `CLAUDE.md`, `agents/claude.md`, or other coding-agent instruction files
+
+Review only the reader boundary:
+
+- Human-facing docs should explain the project, onboarding, install, usage, contribution, and human-readable architecture context.
+- Agent-facing docs should guide agent actions: first hops, code-intelligence requirements, skip rules, boundary checks, verification choice, and links to human docs when context is needed.
+- Shared facts may appear in both places only when expressed for different readers.
+
+Report likely misplaced information as suggestions. Do not move or rewrite `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs unless the user explicitly asks for that edit.
+
+Avoid repeated suggestions:
+
+1. Check the nearest managed `AGENTS.md` for `audience_boundary_review`.
+2. If `status` is `suggested`, `dismissed`, or `resolved`, and all listed files have not changed since `checked_at_commit`, do not repeat the same suggestion.
+3. Re-run the review when any listed file changed since `checked_at_commit`, the reviewed file set changed, or the user explicitly asks.
+4. In check-only mode, report suggestions without writing metadata unless the user explicitly asks to record the review state.
+5. In create or refresh mode, record or update `audience_boundary_review` only in the nearest managed `AGENTS.md`.
+
+Use `status: suggested` after reporting active suggestions, `status: dismissed` when the user declines, and `status: resolved` when no active suggestion remains after review or cleanup.
+
+Do not add YAML front matter to non-`AGENTS.md` docs for this review. If those files already have project-specific front matter, preserve it and leave Agents Tree metadata out of it.
+
 ## Evidence Collection
 
 Separate instruction reading from evidence discovery:

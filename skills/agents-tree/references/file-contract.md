@@ -50,6 +50,36 @@ Before writing or refreshing `critical_symbols`, verify each entry resolves to a
 
 `critical_symbols` is not a full function list. It should contain only durable high-value entry points, shared boundary functions, or symbols whose change would invalidate local guidance. For a medium module, prefer about 8-15 symbols unless the module has a strong documented reason for more.
 
+### Optional Audience Boundary Metadata
+
+When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md`, a managed `AGENTS.md` may record that the audience-boundary review has already been suggested, dismissed, or resolved:
+
+```yaml
+audience_boundary_review:
+  checked_at_commit: abc123
+  status: suggested
+  files:
+    - README.md
+    - AGENTS.md
+    - CLAUDE.md
+```
+
+Allowed `status` values:
+
+- `suggested`: the agent reported possible audience-boundary moves; do not repeat while reviewed files are unchanged.
+- `dismissed`: a human declined or postponed the suggestion; do not repeat while reviewed files are unchanged.
+- `resolved`: the audience boundary was reviewed and no active suggestion remains; re-check only after reviewed files change.
+
+This metadata is advisory. It does not make the `AGENTS.md` stale or invalid by itself.
+
+### Front Matter Boundaries
+
+Agents Tree YAML front matter belongs only in maintained `AGENTS.md` files.
+
+Do not add Agents Tree front matter or Agents Tree metadata to `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs. If those files already use front matter for a site generator, documentation tool, or local convention, preserve it and do not add Agents Tree fields there.
+
+If an audience-boundary review needs persistent state, record it in the nearest managed `AGENTS.md`, not in the human-facing or tool-specific doc.
+
 ## Managed Sections
 
 Generated content must live inside:

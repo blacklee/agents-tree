@@ -13,6 +13,8 @@ This skill is only the maintenance workflow. The decision-compression tree belon
 
 Generated `AGENTS.md` files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
 
+When a directory contains both human-facing docs such as `README.md` and agent-facing docs such as `AGENTS.md`, `CLAUDE.md`, or `agents/claude.md`, this skill may review whether information is placed for the right reader. This is an advisory audience-boundary check, not general documentation cleanup.
+
 ## Decision Compression Value
 
 Create or refresh generated knowledge only when it reduces concrete future reasoning cost:
@@ -69,11 +71,12 @@ Do not update the tree for every code change. Update it only when the change aff
 4. Stop knowledge-tree maintenance for this file if `owner: human-maintained`, malformed markers, or an unresolved ancestor conflict blocks it.
 5. If applicable project guidance declares a code graph or code-intelligence tool, **MUST** use it before creating, reviewing, or refreshing generated knowledge; use `grep`/`rg` only as supplementary evidence.
 6. Decide whether the target directory needs an `AGENTS.md`; state the decision-compression reason before creating a child file.
-7. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
-8. Write generated sections as routing rules: concrete skip rules, first-hop rules, cross-module checks, and verification-choice hints.
-9. Update only managed generated sections unless the user explicitly asks to edit human sections.
-10. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
-11. Summarize touched files, evidence reviewed, freshness status, decision cost saved, and unresolved conflicts.
+7. If the target directory contains both human-facing and agent-facing docs, run an Audience Boundary Review unless unchanged metadata says it was already suggested, dismissed, or resolved.
+8. Preserve parent/child separation: root files route agents; leaf files hold concrete local knowledge.
+9. Write generated sections as routing rules: concrete skip rules, first-hop rules, cross-module checks, and verification-choice hints.
+10. Update only managed generated sections unless the user explicitly asks to edit human sections.
+11. If generated knowledge contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.
+12. Summarize touched files, evidence reviewed, freshness status, decision cost saved, audience-boundary suggestions, and unresolved conflicts.
 
 ## Section Safety
 
@@ -84,6 +87,20 @@ Do not update the tree for every code change. Update it only when the change aff
 - Preserve unmanaged text outside managed sections as human-maintained content.
 - `owner: human-maintained` blocks all edits to the file unless the user explicitly asks to edit that human-owned file.
 - Before refreshing a child `AGENTS.md`, check applicable ancestors for unresolved conflict blocks that cover the target path.
+- Do not add Agents Tree YAML front matter to `README.md`, `CLAUDE.md`, `agents/claude.md`, or other non-`AGENTS.md` docs. Preserve existing front matter in those files if the project already uses it, but do not add Agents Tree metadata there.
+
+## Audience Boundary Review
+
+Use this lightweight check when a directory contains both human-facing docs and agent-facing docs:
+
+- Human-facing docs include `README.md` and similar onboarding, product, install, usage, or contribution docs.
+- Agent-facing docs include `AGENTS.md`, `CLAUDE.md`, `agents/claude.md`, and other coding-agent instruction files.
+- Human-facing docs should explain the project to people.
+- Agent-facing docs should guide agent actions: first hops, tool requirements, skip rules, boundary checks, verification choice, and where to find human context.
+
+Do not move or rewrite audience-mismatched content by default. Report concise suggestions and ask for explicit approval before editing non-`AGENTS.md` files.
+
+Avoid repeated suggestions. If the nearest managed `AGENTS.md` records an `audience_boundary_review` with `status: suggested`, `dismissed`, or `resolved`, and the reviewed files have not changed since `checked_at_commit`, do not repeat the same suggestion. Re-review only when those files changed or the user explicitly asks.
 
 ## Cross-Module Handoff
 
