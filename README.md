@@ -8,7 +8,7 @@ The goal is simple: let agents spend fewer tokens deciding where to inspect next
 
 > Status: early project. This repository currently defines the product direction, file contract, and skill workflow for maintaining AGENTS.md-compatible decision guidance inside target projects.
 
-Installation guide: [`INSTALL.zh.md`](INSTALL.zh.md).
+Installation guide: [`INSTALL.md`](INSTALL.md).
 
 ## Why
 
