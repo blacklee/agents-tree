@@ -55,7 +55,3 @@ agents_tree_skip: []
 - Evidence type: code graph/context, source scan, tests, commit diff, or explicit human note.
 - Symbol check: every `critical_symbols` entry resolves to a real code symbol.
 <!-- agents-tree:generated:end -->
-
-<!-- agents-tree:human:start -->
-Add human-maintained implementation notes here.
-<!-- agents-tree:human:end -->

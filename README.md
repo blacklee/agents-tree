@@ -123,11 +123,11 @@ Agents Tree metadata belongs in maintained decision-guidance artifacts: native `
 
 Agents Tree classifies generated guidance into three states:
 
-- `VALID`: no relevant evidence changed since `last_verified_commit`
-- `STALE_WARNING`: relevant evidence changed, but the module shape appears mostly intact
-- `INVALID`: critical files, symbols, ownership boundaries, or execution flows changed enough that the agent must rescan the code
+- `VALID`: recorded critical evidence, relevant current diffs or flows, and generated claims were checked and still support the guidance
+- `STALE_WARNING`: relevant evidence changed, but the generated claims appear mostly usable after focused review
+- `INVALID`: critical files, symbols, ownership boundaries, execution flows, or generated claims changed enough that the agent must rescan the code
 
-The exact classifier should combine Git diffs with optional code graph, code-intelligence, static import graph, or language-server data.
+A reviewer may combine Git diffs with code graph, code-intelligence, static import graph, language-server data, or focused source reads. The important point is claim-evidence validation, not filename-only or diff-only checking.
 
 ## Managed Sections
 
@@ -201,7 +201,7 @@ Freshness can be reviewed manually or by an agent during normal work.
 
 The reviewer reads metadata, compares the recorded evidence against the current code, and classifies the guidance:
 
-- `VALID`: the recorded evidence still supports the guidance.
+- `VALID`: recorded critical evidence, relevant current diffs or flows, and generated claims were checked and still support the guidance.
 - `STALE_WARNING`: something changed and the guidance may need a partial update.
 - `INVALID`: the guidance must not be trusted until the code is inspected again.
 

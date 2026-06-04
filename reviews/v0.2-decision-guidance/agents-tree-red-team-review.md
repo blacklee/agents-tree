@@ -9,6 +9,7 @@ Review environment:
 - Model: GPT-5.5
 - Reasoning effort: high
 - Skill workflow: Superpowers SKILL (`using-superpowers`) and `agents-tree`
+- Requested rerun: `2C`
 
 Prompt used:
 
@@ -28,270 +29,279 @@ Scope reviewed:
 - `skills/agents-tree/assets/root.AGENTS.md`
 - `skills/agents-tree/assets/module.AGENTS.md`
 - `skills/agents-tree/assets/leaf.AGENTS.md`
-- existing review notes in `reviews/v0.1-knowledge-tree/` and `reviews/v0.2-decision-guidance/`
+- previous result file `reviews/v0.2-decision-guidance/agents-tree-red-team-review.md`
 
 Review goal: find scenarios where the current Agents Tree decision-guidance skill may cause an agent to do the wrong thing, waste tokens, delete human-maintained content, block work incorrectly, choose the wrong artifact strategy, or generate stale decision guidance.
 
+## Regression Status From Previous Review
+
+The updated skill closes most of the previous high-risk gaps. The current docs now explicitly cover sidecar pointer approval, sidecar repository-root discovery, native/sidecar ancestor overlap, proposed-diff review, unavailable code-intelligence tools, dirty working-tree evidence, unresolved placeholders, one-time `agents_tree_keep` exceptions, `agents_tree_skip` not hiding critical evidence, conflict status parsing, audience-boundary uncertainty, README over-generation wording, and the OpenAI manifest's Review Mode / human-section preservation surface.
+
+The remaining risks are now less about missing product principles and more about executable edge cases: where metadata is stored, how existing unmarked files are migrated, how placeholders in protected areas behave, how agents know a code-intelligence tool is actually declared, and how to avoid stale-but-valid-looking guidance when the guidance artifact itself or its evidence model is ambiguous.
+
 ## Failure Scenarios
 
-### 1. Sidecar Pointer Requires Editing A Human-Owned Root `AGENTS.md`
+### 1. Existing `AGENTS.md` Has Non-Agents Front Matter
 
 Scenario:
 
-A target project explicitly chooses sidecar mode because its root `AGENTS.md` is a strict human-owned instruction file. The sidecar contract requires a short root pointer to `decision-router.md`. The agent treats the sidecar choice as permission to edit the root `AGENTS.md`, inserts the pointer, and accidentally disturbs strict tool instructions or unmarked human content.
+A target repository already has an unmarked root `AGENTS.md` with YAML front matter used by another tool, documentation generator, or local convention. The agent treats the file as eligible for Agents Tree creation, inserts Agents Tree fields into the existing front matter, or replaces the existing front matter with the Agents Tree template.
 
 Current docs already prevent this?
 
-Partially. The docs say sidecar mode requires a root pointer, and they also say human-owned or unmarked `AGENTS.md` content must be preserved. They do not state which rule wins when the required sidecar pointer must be added to a strict human-owned instruction file.
+Partially. The contract says existing unmarked `AGENTS.md` body text is human-maintained and must be preserved byte-for-byte. It also says not to add Agents Tree fields to human-facing docs or tool-specific docs that already have front matter. It does not explicitly cover existing non-Agents front matter in `AGENTS.md` itself.
 
 What happens if not prevented:
 
-- The agent edits a human-owned instruction surface without explicit approval.
-- A strict `AGENTS.md` may lose ordering, formatting, or emphasis that affects other agents.
-- Sidecar mode becomes unsafe precisely for the projects that need it most.
+- The agent corrupts a human-owned metadata block while believing it only added required Agents Tree metadata.
+- Another tool may stop parsing the file correctly.
+- The file may appear contract-compliant while the original human-maintained metadata was altered.
 
 Rule to add or clarify:
 
-Selecting sidecar mode is not permission to edit a human-owned, strict, or unmarked root `AGENTS.md`. If the root pointer is missing, ask for explicit approval before adding it. If approval is not given, report that sidecar guidance exists but may not be reliably discovered.
+If an existing `AGENTS.md` has front matter that is not already an Agents Tree metadata block, treat that front matter as human-maintained. Do not merge, rewrite, or replace it without explicit approval. Prefer sidecar mode or a separate approved normalization step when Agents Tree metadata must be added.
+
+Files to change:
+
+- `skills/agents-tree/references/file-contract.md`
+- `skills/agents-tree/references/maintenance-workflow.md`
+- `skills/agents-tree/SKILL.md`
+
+### 2. Initial Creation Adds YAML To A Strict Unmarked `AGENTS.md`
+
+Scenario:
+
+A project has a strict unmarked root `AGENTS.md` containing behavior instructions only. The user asks to "create an Agents Tree." The workflow says metadata belongs at the beginning of maintained artifacts and says adding metadata as front matter during unmarked migration is allowed if needed. The agent prepends YAML to the strict instruction file, changing the first content future agents see.
+
+Current docs already prevent this?
+
+Partially. Sidecar pointer edits to strict, human-owned, or unmarked root `AGENTS.md` require explicit approval. But initial native-mode creation still allows front matter insertion in an existing unmarked `AGENTS.md` without the same explicit approval gate.
+
+What happens if not prevented:
+
+- The strict instruction surface is changed even if the original body is byte-for-byte preserved below the YAML.
+- Some agents may treat the YAML as instruction text or let it dilute the first visible rule.
+- Native mode becomes risky for the exact projects that already have strict `AGENTS.md` files.
+
+Rule to add or clarify:
+
+Adding Agents Tree YAML front matter to an existing unmarked, strict, or human-owned `AGENTS.md` is a separate explicit edit, just like adding a sidecar pointer. Without approval, report that native generated guidance cannot be safely inserted into that file and recommend sidecar mode or a child artifact whose owner is clear.
 
 Files to change:
 
 - `skills/agents-tree/SKILL.md`
+- `skills/agents-tree/references/file-contract.md`
+- `skills/agents-tree/references/maintenance-workflow.md`
+
+### 3. Template Human Placeholder Becomes Protected Forever
+
+Scenario:
+
+An agent copies `assets/module.AGENTS.md` and fills the generated section, but leaves this template text intact:
+
+```md
+<!-- agents-tree:human:start -->
+Add human-maintained module notes here.
+<!-- agents-tree:human:end -->
+```
+
+Later refreshes correctly preserve the human section byte-for-byte, so the fake placeholder becomes durable "human-maintained" content.
+
+Current docs already prevent this?
+
+No. Unresolved placeholders in front matter, generated sections, `Knowledge Status`, and `Evidence Notes` make a file invalid. The rule does not mention placeholders inside human sections, and the templates include human-section placeholder prose.
+
+What happens if not prevented:
+
+- Future agents preserve template filler because it is inside a protected human section.
+- Reviewers may treat an empty human section as intentional.
+- Cleanup later requires explicit human-section editing even though the text was never human-authored.
+
+Rule to add or clarify:
+
+Templates should not include human-section placeholder prose that can be mistaken for maintained human content. Either omit the human section by default, include it only as a commented template instruction outside managed markers, or classify known template filler inside human sections as invalid during creation before the file is considered maintained.
+
+Files to change:
+
+- `skills/agents-tree/assets/root.AGENTS.md`
+- `skills/agents-tree/assets/module.AGENTS.md`
+- `skills/agents-tree/assets/leaf.AGENTS.md`
+- `skills/agents-tree/references/file-contract.md`
+
+### 4. Module Template Starts Medium Confidence With Empty Evidence
+
+Scenario:
+
+An agent creates a module guide from `assets/module.AGENTS.md`. The template has `confidence: medium`, empty `critical_files`, empty `critical_symbols`, and a generated `Knowledge Status` that also says medium. The agent fills only routing bullets and leaves critical evidence empty.
+
+Current docs already prevent this?
+
+Partially. The contract says new generated guidance with empty `critical_files` and `critical_symbols` should use low confidence unless Evidence Notes name another concrete checked source. The root and leaf templates are low confidence, but the module template still starts at medium.
+
+What happens if not prevented:
+
+- Freshly generated module guidance looks more trustworthy than its evidence supports.
+- Future agents may treat a medium-confidence module file as usable even though there is no recorded re-check target.
+- The template contradicts the contract and teaches the wrong default.
+
+Rule to add or clarify:
+
+Set the module template to `confidence: low` when recorded evidence is empty, or add explicit template evidence fields that must be replaced before medium confidence is allowed.
+
+Files to change:
+
+- `skills/agents-tree/assets/module.AGENTS.md`
+- `skills/agents-tree/references/file-contract.md`
+
+### 5. Code-Intelligence Tool Declaration Is Undefined
+
+Scenario:
+
+A target project uses Graphify, GitNexus, Sourcebot, or CodeQL. The README lists these as companion tools, a parent `AGENTS.md` mentions one informally, and a generated section says "use the declared code-intelligence tool." During refresh, one agent treats the README companion list as a declaration and attempts multiple tools; another agent misses the informal note and uses only `rg`.
+
+Current docs already prevent this?
+
+Partially. The workflow repeatedly says declared code graph or code-intelligence tools must be attempted first, and it gives conservative behavior when tools are unavailable. It does not define where a declaration lives, what syntax makes it authoritative, or how examples differ from a project declaration.
+
+What happens if not prevented:
+
+- Agents waste tokens attempting optional tools that were merely mentioned.
+- Other agents fail to attempt a tool the project actually depends on.
+- Freshness classifications differ across agents because "declared" is interpreted differently.
+
+Rule to add or clarify:
+
+Define authoritative declaration locations and syntax. For example, allow only nearest applicable guidance metadata, a visible `Evidence Notes` declaration, or an explicit human instruction in the current task to require a tool. State that README companion-tool lists are examples, not tool declarations.
+
+Files to change:
+
 - `skills/agents-tree/references/file-contract.md`
 - `skills/agents-tree/references/maintenance-workflow.md`
 - `README.md`
 - `README.zh.md`
 
-### 2. Sidecar Discovery Uses The Wrong Repository Root
+### 6. Ambiguous `critical_symbols` Resolve To The Wrong Symbol
 
 Scenario:
 
-A workspace contains nested repositories or a monorepo with multiple package roots. The agent sees a parent `AGENTS.md` pointer to `decision-router.md` and follows sidecar files from the workspace root instead of the Git repository or package root that owns the target code. It then reads irrelevant parent guidance or misses the actual target sidecar.
+A monorepo has `Config`, `Router`, and `createClient` symbols in several packages. A module guide records `critical_symbols: ["Config", "createClient"]`. During freshness review, the agent proves that a symbol with that name exists somewhere, but it checks the wrong package and marks the guidance `VALID`.
 
 Current docs already prevent this?
 
-Partially. `file-contract.md` handles multi-repo `last_verified_commit`, but sidecar pointer discovery does not define the root selection rule for nested repos, package workspaces, or submodules.
+Partially. The contract says every `critical_symbols` entry must resolve to a real code symbol and should not contain aliases or approximate labels. It does not say ambiguous symbol names are invalid or require module/path qualification.
 
 What happens if not prevented:
 
-- The agent applies the wrong decision guidance to the target directory.
-- It may skip relevant source evidence because a parent workspace guide says the task belongs elsewhere.
-- It may advance metadata using the right repository commit but the wrong sidecar guidance path.
+- Freshness checks can pass against unrelated symbols.
+- A changed boundary symbol in the real module is missed.
+- Guidance looks verified because the metadata contains real, but ambiguous, names.
 
 Rule to add or clarify:
 
-In sidecar mode, discover sidecar files from the repository root that contains the maintained artifact and target code. If multiple roots are plausible, report the ambiguity and do not classify sidecar guidance as `VALID` until the owner root is established.
+`critical_symbols` must resolve unambiguously in the target module context. If a symbol name is duplicated across packages, languages, or generated sources, qualify it with its module path or pair it with a `critical_files` entry / Evidence Note that makes the resolution unique. Ambiguous symbol metadata is `INVALID` until disambiguated.
 
 Files to change:
 
 - `skills/agents-tree/references/file-contract.md`
 - `skills/agents-tree/references/maintenance-workflow.md`
-- `README.md`
-
-### 3. Native And Sidecar Guidance Overlap Across Ancestor And Child Nodes
-
-Scenario:
-
-The root has native generated `AGENTS.md` decision guidance, while `src/payments/decision-router.md` contains sidecar guidance for a child module. The docs prohibit maintaining both native and sidecar guidance for the same directory, but this overlap is not in the same directory. The agent treats the hybrid tree as valid and applies both, even though their artifact strategies imply different discovery rules.
-
-Current docs already prevent this?
-
-Partially. The same-directory overlap rule is clear. The ancestor/descendant hybrid case is not explicit.
-
-What happens if not prevented:
-
-- Future agents do not know whether native or sidecar mode is authoritative for a subtree.
-- A root native file may route agents away from the sidecar tree, or the sidecar tree may contradict the native parent.
-- Refreshes may update one artifact strategy while leaving the other stale.
-
-Rule to add or clarify:
-
-Artifact strategy should be coherent for each covered subtree. If native and sidecar generated guidance overlap by ancestry, stop and ask whether the subtree is being migrated, intentionally split, or should use one strategy. Record the decision in the nearest authoritative guidance artifact before refresh.
-
-Files to change:
-
-- `skills/agents-tree/SKILL.md`
-- `skills/agents-tree/references/file-contract.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-
-### 4. Review Mode Misses Destructive Changes In A Proposed Diff
-
-Scenario:
-
-A user asks the agent to review a pull request that changes `AGENTS.md`. The final file has valid markers, but the diff deleted unmanaged human text outside the managed sections and replaced several human notes with generated bullets. The Review Mode checklist focuses on whether the final file reduces decision cost, so the agent rates it `HIGH` and misses that the diff destroyed human-maintained content.
-
-Current docs already prevent this?
-
-Partially. The section-safety rules protect human text during refresh. Review Mode does not explicitly say to compare proposed diffs against the previous file and identify human-content deletion or ownership boundary changes.
-
-What happens if not prevented:
-
-- A review approves a diff that the skill itself should never have produced.
-- Human-maintained instructions disappear while the final file still looks contract-compliant.
-- The reviewer reports token-saving value but misses the larger safety regression.
-
-Rule to add or clarify:
-
-When reviewing proposed guidance changes, compare the diff against the previous file, not only the final artifact. Flag deletion, movement, wrapping, or rewriting of unmanaged text or human sections unless the diff includes explicit human approval.
-
-Files to change:
-
-- `skills/agents-tree/references/maintenance-workflow.md`
-- `skills/agents-tree/SKILL.md`
-- `reviews/v0.2-decision-guidance/prompts/agents-tree-skill-review.md`
-
-### 5. Declared Code-Intelligence Tool Is Missing, But Guidance Is Marked `VALID`
-
-Scenario:
-
-A target `AGENTS.md` says generated knowledge depends on a project code graph. The graph tool is unavailable in the current agent environment. The agent follows the bounded no-tool sequence, reads the current diff and a few critical files, then reports `VALID` because it found no obvious contradiction.
-
-Current docs already prevent this?
-
-Partially. `SKILL.md` says the declared tool **MUST** be used. `maintenance-workflow.md` allows `grep`, `rg`, and raw reads when the declared tool is unavailable or stale. The conservative classification rule is implied but not crisp.
-
-What happens if not prevented:
-
-- Guidance receives a fresh-looking `VALID` state without the evidence class it originally required.
-- Later agents trust stale boundary or caller assumptions that only the missing code-intelligence tool would have exposed.
-- The bounded no-tool sequence becomes a silent downgrade rather than an explicit limitation.
-
-Rule to add or clarify:
-
-The declared tool must be attempted first. If it is unavailable, stale, or partial, the bounded sequence may support `STALE_WARNING`, `INVALID`, or `cannot verify`; it may support `VALID` only when every generated claim is fully re-evidenced without the missing tool and the limitation is recorded in `Evidence Notes` or the review report.
-
-Files to change:
-
-- `skills/agents-tree/SKILL.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-- `skills/agents-tree/references/file-contract.md`
-
-### 6. Dirty Working Tree Makes `last_verified_commit` Lie
-
-Scenario:
-
-The agent refreshes a guidance file while the working tree has uncommitted source edits affecting recorded `critical_files`. It sets `last_verified_commit` to `HEAD`, writes generated guidance based on the uncommitted code, and reports the file as fresh. Later the uncommitted code changes again or is discarded, but the guidance still claims it was verified at `HEAD`.
-
-Current docs already prevent this?
-
-Partially. The docs say to check current diffs before advancing `last_verified_commit`, but they do not define how to represent guidance verified against uncommitted working-tree state.
-
-What happens if not prevented:
-
-- `last_verified_commit` points to a commit that never contained the verified evidence.
-- Reviewers cannot reconstruct what code state supported the generated claims.
-- Future freshness checks may mark stale guidance `VALID` because the commit hash looks current.
-
-Rule to add or clarify:
-
-If generated guidance depends on uncommitted changes, do not advance `last_verified_commit` as though `HEAD` contains that evidence. Either wait until the source changes are committed, or record a visible working-tree evidence note and classify conservatively until a real commit can verify the claims.
-
-Files to change:
-
-- `skills/agents-tree/references/file-contract.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-- `skills/agents-tree/assets/root.AGENTS.md`
 - `skills/agents-tree/assets/module.AGENTS.md`
 - `skills/agents-tree/assets/leaf.AGENTS.md`
 
-### 7. Template Placeholders Survive Into Maintained Guidance
+### 7. Native/Sidecar Overlap Resolution Has No Safe Place To Record The Decision
 
 Scenario:
 
-An agent copies `assets/module.AGENTS.md`, fills a few bullets, but leaves `COMMIT_SHA`, `TASK_SHAPE`, `DECISION_1`, `SymbolName`, and `path/to/file` in the generated section. The file has valid markers and metadata shape, so later agents read the placeholders as fuzzy guidance or waste tokens trying to resolve nonexistent symbols.
+A repository has root native generated `AGENTS.md` guidance and a child `src/payments/decision-router.md`. The new rules correctly say not to refresh overlapping native and sidecar guidance unless a human asks to migrate, split, or resolve the overlap, and to record the decision in the nearest authoritative artifact before refresh. But the nearest artifact is itself human-owned, unmarked, malformed, or part of the overlap.
 
 Current docs already prevent this?
 
-Partially. Template comments say to delete unused headings and verify symbols, but unresolved placeholders are not explicitly classified as invalid.
+Partially. The overlap rule is now clear. The recording rule does not say what to do when no safe authoritative artifact is editable.
 
 What happens if not prevented:
 
-- Placeholder text becomes durable project guidance.
-- `critical_symbols` may look empty while generated bullets still name fake symbols.
-- Future agents waste tokens interpreting placeholders or query nonexistent targets.
+- The agent may edit an unsafe artifact just to record the migration decision.
+- Or it may block indefinitely even after the human has verbally chosen a strategy.
+- Different agents may record the decision in different places, creating more overlap.
 
 Rule to add or clarify:
 
-Unresolved template placeholders in front matter, generated sections, `Knowledge Status`, or Evidence Notes make a maintained guidance artifact `INVALID`. Before committing or reporting refresh completion, replace or delete all placeholders such as `COMMIT_SHA`, `TASK_SHAPE`, `DECISION_1`, `SymbolName`, and `path/to/file`.
+If no safe authoritative artifact exists, do not force a record into an unsafe file. Report the selected migration/split decision in the review output, ask for explicit approval for the exact artifact that should record it, and keep overlap refresh blocked until that approved edit is made.
 
 Files to change:
 
-- `skills/agents-tree/references/file-contract.md`
 - `skills/agents-tree/references/maintenance-workflow.md`
-- `skills/agents-tree/assets/root.AGENTS.md`
-- `skills/agents-tree/assets/module.AGENTS.md`
-- `skills/agents-tree/assets/leaf.AGENTS.md`
+- `skills/agents-tree/references/file-contract.md`
+- `skills/agents-tree/SKILL.md`
 
-### 8. Root Template Starts With High Confidence And No Critical Evidence
+### 8. Conflict Block Inside A Generated Section Gets Deleted
 
 Scenario:
 
-An agent creates a root `AGENTS.md` from `assets/root.AGENTS.md`. The template starts with `confidence: high`, empty `critical_files`, and empty `critical_symbols`. The agent writes root routing guidance but forgets to add critical evidence. Later freshness checks see no recorded evidence and incorrectly treat the root as stable.
+A previous agent wrote an unresolved conflict block inside `<!-- agents-tree:generated:start --> ... <!-- agents-tree:generated:end -->`. A later refresh validates the generated markers, replaces the generated section wholesale, and accidentally deletes the unresolved conflict.
 
 Current docs already prevent this?
 
-Partially. The contract says generated claims should be traceable and freshness checks require recorded evidence. The root template still presents high confidence with empty evidence as a starting state.
+Partially. The docs require parsing conflict blocks and say unresolved conflicts block maintenance. They do not explicitly classify conflict markers nested inside generated or human sections as invalid placement.
 
 What happens if not prevented:
 
-- Root guidance appears more authoritative than its evidence supports.
-- Future agents have no concrete paths or symbols to re-check before trusting root routing.
-- README claims about verified guidance are weakened at the most visible node.
+- A real unresolved conflict disappears during a normal generated-section refresh.
+- The subtree becomes authoritative-looking even though human review was required.
+- The safety marker becomes vulnerable to exactly the edit operation it was supposed to block.
 
 Rule to add or clarify:
 
-New generated guidance with empty `critical_files` and empty `critical_symbols` must default to low confidence and cannot be classified `VALID` unless Evidence Notes name another concrete checked source, such as an explicit human note or verified repository structure. The root template should not default to high confidence with empty evidence.
-
-Files to change:
-
-- `skills/agents-tree/assets/root.AGENTS.md`
-- `skills/agents-tree/references/file-contract.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-
-### 9. One-Time `agents_tree_keep` Exception Becomes A Durable Reopen Rule
-
-Scenario:
-
-A human asks the agent in the current task to inspect one exact ignored generated file because it is relevant to a bug. The agent records that file in `agents_tree_keep`. Future agents now treat the ignored path as a durable exception and keep reopening generated or sensitive-adjacent content for unrelated tasks.
-
-Current docs already prevent this?
-
-Partially. The docs say `agents_tree_keep` must not reopen secrets, dependencies, build outputs, generated artifacts, or vendored code unless a human explicitly asks for that exact path in the current task. They do not say that current-task exceptions should usually stay out of durable metadata.
-
-What happens if not prevented:
-
-- A one-time permission becomes persistent metadata.
-- Token usage grows because ignored paths are repeatedly reopened.
-- Generated artifacts or sensitive-adjacent files become easier for agents to inspect accidentally.
-
-Rule to add or clarify:
-
-Do not record current-task ignore exceptions in durable `agents_tree_keep` unless the human explicitly asks to make the exception permanent and the path is safe for future tasks. Otherwise mention the exception only in the current response or Evidence Notes for that task.
+Conflict blocks are managed safety blocks and must be outside generated and human sections. Any conflict marker nested inside a mutable generated section or protected human section makes the file `INVALID` for guidance maintenance until a human-approved normalization moves or resolves it. Refresh must preserve conflict blocks byte-for-byte unless explicitly resolving them.
 
 Files to change:
 
 - `skills/agents-tree/references/file-contract.md`
 - `skills/agents-tree/references/maintenance-workflow.md`
 
-### 10. Skip Rules Hide Critical Evidence During Freshness Checks
+### 9. Review Mode Approves A Final Artifact Without A Baseline
 
 Scenario:
 
-A parent guidance file has `agents_tree_skip: ["src/legacy/**"]` because legacy code is usually irrelevant. A child or module guidance file records `src/legacy/compat.ts` as a critical file for a compatibility boundary. During freshness review, the agent applies the parent skip first and never checks the critical file.
+A user pastes the final contents of a proposed `AGENTS.md` but not the previous file or Git diff. The final artifact has valid markers, plausible metadata, and concise routing rules. The reviewer assigns a `HIGH` token-saving rating but cannot see that the change deleted unmanaged human text from the old file.
 
 Current docs already prevent this?
 
-Partially. Evidence collection says apply ignore files, then `agents_tree_skip`, then `agents_tree_keep`. It does not explicitly define precedence when recorded critical evidence is inside a skipped path.
+Partially. Review Mode says to compare proposed diffs against the previous file when a diff is available. It does not say that human-content preservation cannot be verified when the baseline is missing.
 
 What happens if not prevented:
 
-- A critical file changes but the freshness review misses it.
-- The agent may classify guidance as `VALID` after intentionally skipping required evidence.
-- Skip rules become a way to hide stale knowledge.
+- A destructive change can be approved because only the final state was reviewed.
+- The token-saving rating hides the safety limitation.
+- Review Mode becomes weaker than Refresh Mode's own preservation rules.
 
 Rule to add or clarify:
 
-Recorded `critical_files` and `critical_symbols` must be checked even if they match `agents_tree_skip`. If they are skipped by project ignore files or cannot be checked safely, report `INVALID` or cannot verify instead of silently trusting the guidance. `agents_tree_skip` should not suppress recorded evidence.
+When reviewing a proposed guidance change without the previous file or diff, explicitly state that human-section and unmanaged-text preservation cannot be verified. Do not give an unqualified approval; include the limitation next to the token-saving value rating and request the baseline for safety review.
+
+Files to change:
+
+- `skills/agents-tree/references/maintenance-workflow.md`
+- `skills/agents-tree/SKILL.md`
+
+### 10. Dirty Guidance Artifact Is Classified As `VALID`
+
+Scenario:
+
+The code evidence is clean and committed, but the maintained `AGENTS.md` itself has uncommitted generated-section edits. The agent checks `last_verified_commit`, sees the recorded critical files are unchanged, and reports `VALID` even though the current guidance text is not what existed at `last_verified_commit`.
+
+Current docs already prevent this?
+
+Partially. The docs prevent advancing `last_verified_commit` when generated guidance depends on uncommitted source changes. They do not separately handle an uncommitted change to the guidance artifact itself.
+
+What happens if not prevented:
+
+- `VALID` is reported for text that is not represented by the recorded commit.
+- Reviewers cannot reconstruct which generated claims were verified.
+- A later reset or rewrite of the guidance artifact breaks the supposed freshness state.
+
+Rule to add or clarify:
+
+Freshness review must check the maintained guidance artifact's own diff. If the artifact has uncommitted generated, metadata, conflict, or human-section changes, report the artifact as dirty and do not classify the current text as committed `VALID`. Instead classify the committed version, or review the working-tree version with a visible limitation.
 
 Files to change:
 
@@ -299,131 +309,137 @@ Files to change:
 - `skills/agents-tree/references/maintenance-workflow.md`
 - `skills/agents-tree/SKILL.md`
 
-### 11. Conflict Block Status Is Malformed Or Ambiguous
+### 11. Project-Installed Skill Files Become Target Guidance Candidates
 
 Scenario:
 
-An `AGENTS.md` contains a conflict block with `status: unresolved` buried under prose, duplicated status lines, or `status: resolved` without a resolution note. The agent only checks for the marker pair, assumes the conflict is resolved or irrelevant, and refreshes a child guidance file.
+A team installs Agents Tree into a target repo at `.agents/skills/agents-tree` as recommended by `INSTALL.md`. Later, an agent is asked to create or refresh decision guidance for the target repo. During candidate discovery it sees `.agents/skills/agents-tree/assets/root.AGENTS.md`, `.agents/skills/agents-tree/assets/module.AGENTS.md`, and the skill's own `SKILL.md`, then treats the installed skill package as project evidence or as candidate guidance to maintain.
 
 Current docs already prevent this?
 
-Partially. The docs define conflict blocks and say unresolved conflicts block maintenance. They do not require parsing conflict-block status mechanically or classify malformed conflict blocks.
+No. The installation docs explicitly allow project-level skill installation, but the maintenance workflow does not say to exclude installed skill packages from target guidance discovery unless the task is about the skill package itself.
 
 What happens if not prevented:
 
-- A malformed unresolved conflict may fail to block descendant refresh.
-- A resolved-looking conflict without human resolution may be treated as safe.
-- Agents may disagree about whether a subtree is authoritative.
+- Agents waste tokens reviewing templates and skill internals as if they were target project guidance.
+- The agent may create or refresh `AGENTS.md` files inside `.agents/skills`.
+- The target project's guidance tree becomes polluted with the maintenance tool's own files.
 
 Rule to add or clarify:
 
-Before maintenance, parse conflict blocks as managed safety markers. Missing, duplicated, or unrecognized conflict `status` values make the file `INVALID` for guidance maintenance. Treat `status: resolved` as non-blocking only when a short resolution note is present; otherwise require human review.
+During target-project guidance discovery, ignore installed skill/plugin directories such as `.agents/skills/**`, `.codex/skills/**`, and known plugin cache directories unless the user explicitly asks to maintain the skill package itself. Project-level skill installation is tooling, not target decision guidance.
 
 Files to change:
 
-- `skills/agents-tree/references/file-contract.md`
 - `skills/agents-tree/references/maintenance-workflow.md`
-
-### 12. Audience-Boundary Suppression Hides A New Misplaced Instruction
-
-Scenario:
-
-The nearest managed guidance artifact has `audience_boundary_review.status: resolved` at `checked_at_commit: abc123`. A human later renames `README.md` to `docs/README.md` and adds new agent-specific instructions to it. The agent cannot compare the old file path cleanly, treats the review as resolved, and suppresses the audience-boundary suggestion.
-
-Current docs already prevent this?
-
-Partially. The workflow says to re-run the review when listed files changed or the reviewed file set changed. It does not define the conservative behavior when `checked_at_commit` cannot be compared, files were renamed, or history is shallow.
-
-What happens if not prevented:
-
-- Agent-specific instructions remain hidden in human-facing docs.
-- Future agents miss or duplicate behavior guidance.
-- The repeat-suppression metadata becomes a stale silencer.
-
-Rule to add or clarify:
-
-If `checked_at_commit` cannot be compared, or any reviewed file was renamed, deleted, or replaced, report the audience-boundary state as uncertain and re-run the advisory check. Do not write or rely on `resolved` suppression until the new file set is reviewed.
-
-Files to change:
-
-- `skills/agents-tree/references/file-contract.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-
-### 13. README Candidate List Encourages Too Many Guidance Files
-
-Scenario:
-
-The README says good candidates include directories with many files, several child modules, high-risk code, historical compatibility logic, or frequent agent access. An enthusiastic agent interprets the list as a creation checklist and creates `AGENTS.md` files across most top-level and mid-level directories before proving a decision-compression reason for each.
-
-Current docs already prevent this?
-
-Mostly in the skill and workflow, but not in the public-facing README wording. `maintenance-workflow.md` says directory size is only supporting evidence and a file must reduce future decision cost. The README list is easier to misread.
-
-What happens if not prevented:
-
-- The guidance tree becomes larger than the source areas it was meant to route.
-- Future agents spend extra tokens reading low-value files.
-- More metadata has to be kept fresh, increasing the stale-knowledge surface.
-
-Rule to add or clarify:
-
-In README candidate guidance, state that these traits are only prompts for investigation, not reasons to create a file. A new guidance file requires a specific decision cost saved before creation.
-
-Files to change:
-
-- `README.md`
-- `README.zh.md`
-- `skills/agents-tree/references/maintenance-workflow.md`
-
-### 14. Agent Manifest Underspecifies Review And Human Protection
-
-Scenario:
-
-An agent surface shows only `skills/agents-tree/agents/openai.yaml` metadata. The default prompt says to "create, check, or refresh" decision guidance. The user asks for a safety review, but the agent assumes the skill is write-oriented and refreshes generated content instead of running Review Mode.
-
-Current docs already prevent this?
-
-Partially. `SKILL.md` includes Review Mode and the human-section rules. The manifest, which may be the user's first contact with the skill, omits review, sidecar, stale/invalid handling, and human-maintained section protection.
-
-What happens if not prevented:
-
-- Users invoke the skill with write-oriented expectations.
-- Agents may skip Review Mode or understate human-content safety.
-- The skill's most important safety contract is not visible in the installation surface.
-
-Rule to add or clarify:
-
-Broaden the manifest default prompt and description to include create, check, refresh, and review, while explicitly preserving human-maintained sections. If the surface permits only one sentence, make safety part of that sentence.
-
-Files to change:
-
-- `skills/agents-tree/agents/openai.yaml`
+- `skills/agents-tree/SKILL.md`
 - `INSTALL.md`
 - `INSTALL.zh.md`
 
+### 12. Broad `agents_tree_skip` Hides Candidate Evidence
+
+Scenario:
+
+A guidance file includes `agents_tree_skip: ["src/legacy/**", "src/generated/**", "packages/*/internal/**"]`. None of the current `critical_files` are inside those globs, so freshness checks pass. But a generated claim says "compatibility behavior lives outside legacy code," and the skipped legacy subtree now contains the actual compatibility implementation.
+
+Current docs already prevent this?
+
+Partially. The contract says keep skip lists small and says recorded critical evidence must still be checked even when it matches `agents_tree_skip`. It does not classify broad source-subtree skip rules as invalid when they can prevent discovery of missing or replacement evidence.
+
+What happens if not prevented:
+
+- The agent misses evidence that should have replaced stale critical metadata.
+- A skip rule becomes a durable blind spot for scope moves.
+- Guidance can remain apparently fresh while its evidence model is incomplete.
+
+Rule to add or clarify:
+
+Broad `agents_tree_skip` globs that exclude source subtrees should be invalid unless they are narrow, task-shaped, evidence-backed, and do not cover plausible ownership or replacement evidence. Skip rules should be reviewed as guidance claims, not just as scan configuration.
+
+Files to change:
+
+- `skills/agents-tree/references/file-contract.md`
+- `skills/agents-tree/references/maintenance-workflow.md`
+
+### 13. Parent/Child Duplication Causes Token Bloat Without Contradiction
+
+Scenario:
+
+The root `AGENTS.md` says payment API shape changes require caller inspection. `src/payments/AGENTS.md` repeats the same rule with no added local first hop. `src/payments/refunds/AGENTS.md` repeats it again. No file contradicts another, so refresh passes, but future agents pay for the same generic instruction at every level.
+
+Current docs already prevent this?
+
+Partially. The docs say root files should act as indexes, child files should not repeat parent guidance, and generated bullets must change the next action. Review and refresh checks emphasize contradictions more than non-contradictory duplication.
+
+What happens if not prevented:
+
+- The tree saves less token budget than promised.
+- Agents may overweight repeated generic guidance.
+- More duplicated bullets must be kept fresh across multiple files.
+
+Rule to add or clarify:
+
+During review and refresh, compare generated child bullets with applicable parent bullets. Delete or rewrite repeated guidance unless the child adds a new local first hop, verification path, skip rule, or boundary detail that changes the next action inside that subtree.
+
+Files to change:
+
+- `skills/agents-tree/references/maintenance-workflow.md`
+- `skills/agents-tree/SKILL.md`
+- `README.md`
+- `README.zh.md`
+
+### 14. Public Freshness Wording Encourages Diff-Only Validation
+
+Scenario:
+
+A reader uses only the README, not the full skill references. The README freshness states say `VALID` means "no relevant evidence changed since `last_verified_commit`." The agent checks Git diff for recorded file paths, sees no changes, and marks the file `VALID` without resolving symbols, checking guidance-artifact dirtiness, or re-evidencing generated claims.
+
+Current docs already prevent this?
+
+Mostly in the references, but not in the public-facing simplified wording. The detailed contract is stricter: stale guidance must not be trusted, missing or ambiguous evidence is invalid, and `VALID` requires recorded evidence still supports generated claims.
+
+What happens if not prevented:
+
+- Agents using the README as the main contract perform shallow freshness checks.
+- README claims about verified guidance are weaker than the actual file contract.
+- A file can be treated as valid because filenames did not change, not because claims were rechecked.
+
+Rule to add or clarify:
+
+Align README freshness wording with the contract: `VALID` requires recorded evidence and current relevant diffs or code-intelligence evidence to still support the generated claims. It is not a filename-only or diff-only status.
+
+Files to change:
+
+- `README.md`
+- `README.zh.md`
+- `skills/agents-tree/references/file-contract.md`
+
 ## Executive Summary
 
-The v0.2 decision-guidance version is much safer than the v0.1 knowledge-tree version. The major v0.1 hazards are now explicitly addressed: unmarked `AGENTS.md` files are human-maintained by default, malformed markers block refresh, missing critical evidence is invalid, conflict blocks are visible, and generated bullets must change the next action.
+The updated Agents Tree skill is materially safer than the previous review target. Most previous red-team findings were directly addressed in `SKILL.md`, `file-contract.md`, `maintenance-workflow.md`, templates, README wording, and the OpenAI manifest.
 
-The remaining red-team risks are mostly edge conditions where two correct rules collide. Sidecar mode needs stronger pointer and root-discovery rules. Review Mode needs to assess diffs, not only final files. Freshness needs a precise dirty-working-tree rule. Tool-required evidence needs a conservative unavailable-tool classification. Templates should make unresolved placeholders invalid, and README/manifest wording should not encourage over-generation or write-oriented use.
+The remaining high-value fixes are about hardening the boundary between human-owned instruction surfaces and maintained decision guidance. The most serious residual issues are initial creation in existing unmarked `AGENTS.md` files, template text inside protected human sections, ambiguous code-intelligence declarations, and freshness checks that do not account for dirty guidance artifacts or ambiguous symbol metadata.
 
-The most important theme is that Agents Tree should fail closed when authority is ambiguous. A missing pointer, ambiguous sidecar root, stale code-intelligence tool, unresolved placeholder, skipped critical file, or malformed conflict status should not produce fresh-looking guidance.
+The skill should keep failing closed when authority is unclear. If the existing file has non-Agents front matter, if a strict root `AGENTS.md` would need YAML prepended, if overlap cannot be recorded safely, if a conflict block is nested in a generated section, or if a review lacks the previous file, the agent should report the limitation rather than producing fresh-looking guidance.
 
 ## Priority Fix List
 
-1. Clarify sidecar pointer approval, sidecar root discovery, and ancestor/child native-sidecar overlap.
-2. Add Review Mode rules for proposed diffs, especially human-content deletion and ownership-boundary changes.
-3. Define conservative freshness behavior for unavailable code-intelligence tools and dirty working trees.
-4. Classify unresolved template placeholders and empty-evidence generated guidance as invalid or low-confidence.
-5. Tighten `agents_tree_keep` and `agents_tree_skip` precedence so one-time exceptions do not become durable reopen rules and skip rules cannot hide critical evidence.
-6. Make conflict-block status parsing mechanical enough to avoid accidental descendant refresh.
-7. Adjust README and manifest wording so the public contract emphasizes decision cost saved, review mode, and human-section protection.
+1. Add explicit approval gates for adding or merging Agents Tree front matter into existing unmarked, strict, human-owned, or non-Agents-front-matter `AGENTS.md` files.
+2. Remove protected human-section placeholder prose from templates, and set the module template to low confidence while evidence is empty.
+3. Define authoritative code-intelligence declaration syntax and distinguish project declarations from README companion-tool examples.
+4. Require unambiguous `critical_symbols`, with path/module qualification when names collide.
+5. Treat dirty maintained guidance artifacts as a separate freshness limitation.
+6. Classify nested conflict blocks and baseline-less reviews conservatively.
+7. Exclude project-installed skill/plugin directories from target guidance discovery by default.
+8. Review broad `agents_tree_skip` globs as guidance claims that can create evidence blind spots.
+9. Add a parent/child duplication check to Review and Refresh mode.
+10. Align README freshness wording with the stricter file contract.
 
 ## Files Most Worth Editing First
 
-1. `skills/agents-tree/references/file-contract.md`: canonicalize sidecar root rules, placeholder invalidity, dirty-working-tree freshness, conflict status validity, and skip/critical-evidence precedence.
-2. `skills/agents-tree/references/maintenance-workflow.md`: add procedures for sidecar pointer approval, Review Mode diff checks, unavailable code-intelligence classification, audience-boundary uncertainty, and one-time keep exceptions.
-3. `skills/agents-tree/SKILL.md`: keep the concise workflow aligned with sidecar safety, diff review, tool-attempt semantics, and critical evidence not being suppressed by skip rules.
-4. `skills/agents-tree/assets/*.AGENTS.md`: remove high-confidence empty-evidence defaults, warn that unresolved placeholders make guidance invalid, and keep templates smaller.
-5. `README.md` and `README.zh.md`: reduce wording that can be read as "create files for large/high-risk directories" and reinforce that each file needs a stated decision-compression reason.
-6. `skills/agents-tree/agents/openai.yaml`: include Review Mode and human-maintained section preservation in the visible invocation surface.
+1. `skills/agents-tree/references/file-contract.md`: front matter ownership, human placeholder invalidity, ambiguous symbols, dirty guidance artifacts, nested conflict markers, broad skip validity.
+2. `skills/agents-tree/references/maintenance-workflow.md`: initial creation gates, no-baseline Review Mode, installed skill directory exclusion, overlap decision recording, parent/child duplication review.
+3. `skills/agents-tree/assets/*.AGENTS.md`: remove fake human notes and fix module-template confidence.
+4. `skills/agents-tree/SKILL.md`: concise reminders for unsafe existing `AGENTS.md` migration, dirty artifact checks, and installed skill package exclusion.
+5. `README.md` and `README.zh.md`: clarify freshness is claim-evidence validation, not diff-only validation; clarify companion tools are examples unless declared in target guidance.
+6. `INSTALL.md` and `INSTALL.zh.md`: warn that project-level skill installation is tooling and should be ignored during target guidance discovery unless the skill package itself is the target.

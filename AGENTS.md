@@ -52,7 +52,7 @@ Avoid adding servers, dashboards, embeddings, databases, background daemons, or 
 
 ## File Contract
 
-Generated native `AGENTS.md` files and explicit sidecar decision-guidance files should use YAML front matter for knowledge metadata.
+Generated native `AGENTS.md` files and explicit sidecar decision-guidance files must begin with YAML front matter for knowledge metadata.
 
 Agents Tree front matter belongs only in maintained decision-guidance artifacts: native `AGENTS.md` files, or explicit sidecar files such as `decision-router.md` when sidecar mode is selected. Do not add Agents Tree metadata to human-facing docs such as `README.md` or tool-specific agent docs such as `CLAUDE.md` / `agents/claude.md`.
 

@@ -4,7 +4,7 @@ module: MODULE_NAME
 last_verified_commit: COMMIT_SHA
 critical_files: []
 critical_symbols: []
-confidence: medium
+confidence: low
 owner: ai-generated
 agents_tree_keep: []
 agents_tree_skip: []
@@ -16,7 +16,7 @@ agents_tree_skip: []
 ## Knowledge Status
 
 - Last verified: `COMMIT_SHA`
-- Confidence: medium
+- Confidence: low
 - Critical evidence: update `critical_files` and `critical_symbols` in front matter.
 - Re-check before trusting this file if those files, symbols, or related flows changed.
 
@@ -55,7 +55,3 @@ agents_tree_skip: []
 - Evidence type: code graph/context, source scan, tests, commit diff, or explicit human note.
 - Symbol check: every `critical_symbols` entry resolves to a real code symbol.
 <!-- agents-tree:generated:end -->
-
-<!-- agents-tree:human:start -->
-Add human-maintained module notes here.
-<!-- agents-tree:human:end -->

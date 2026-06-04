@@ -9,6 +9,7 @@ Review environment:
 - Model: GPT-5.5
 - Reasoning effort: high
 - Skill workflow: Superpowers SKILL (`using-superpowers`) and `agents-tree`
+- Test variant: 2A
 
 Prompt used:
 
@@ -33,138 +34,110 @@ Scope reviewed:
 
 None found.
 
-The v0.2 decision-guidance version resolves the most serious v0.1 execution gaps: mode selection is explicit, malformed markers are invalid for refresh, unmarked `AGENTS.md` content is preserved as human-maintained, visible `Knowledge Status` is required, missing critical evidence remains visible, and generated bullets must pass a next-action test.
+The updated v0.2 decision-guidance skill is coherent and executable for manual skill-driven use. The previous highest-risk gaps around sidecar pointer approval, declared-but-unavailable code-intelligence tools, unresolved placeholders, and proposed-diff review are now addressed in the main skill workflow, file contract, maintenance workflow, templates, and OpenAI manifest.
 
 ## Important Issues
 
-1. **Sidecar mode still needs a sharper rule for editing a strict human-owned root `AGENTS.md` pointer.**
-   - Evidence: `skills/agents-tree/references/file-contract.md` says sidecar mode requires a short root `AGENTS.md` pointer. `skills/agents-tree/SKILL.md` and `file-contract.md` also say unmarked or human-owned `AGENTS.md` content must be preserved and not edited without explicit permission.
-   - Risk: In the exact sidecar scenario this version introduces, an agent may need to add a discovery pointer to a strict root `AGENTS.md`, but that file may be human-owned and marker-free. Without a direct rule, agents may either modify it too freely or refuse sidecar setup even after the project has selected sidecar mode.
-   - Suggested improvement: State that selecting sidecar mode is not itself permission to edit a human-owned root `AGENTS.md`; the agent must either ask for explicit approval to add the pointer or report that sidecar guidance will be hard to discover until the pointer is added.
+1. **Public freshness wording is still more permissive than the executable contract.**
+   - Evidence: `README.md` defines `VALID` as "no relevant evidence changed since `last_verified_commit`" and says the exact classifier should combine Git diffs with optional tools. `README.zh.md` has the same simplified framing. The stricter contract in `skills/agents-tree/references/file-contract.md` requires checking every recorded critical file and symbol, current diffs or code-intelligence evidence that affects generated claims, unresolved placeholders, ignored evidence, unavailable tools, and current references/flows before `VALID`.
+   - Risk: A user or agent relying on the public README rather than the references may treat unchanged recorded files as enough for `VALID`, even though the skill explicitly says not to infer validity from unchanged filenames alone.
+   - Suggested improvement: In both READMEs, change the `VALID` bullet to say that recorded critical evidence and relevant current diffs/flows were checked and still support the generated claims.
 
-2. **The code-intelligence requirement has a small contradiction between “MUST use” and the unavailable-tool path.**
-   - Evidence: `SKILL.md` workflow step 5 says if applicable guidance declares a code graph or code-intelligence tool, the agent **MUST** use it before creating, reviewing, or refreshing generated knowledge. `maintenance-workflow.md` later says `grep`, `rg`, and raw reads may be used when the declared tool is unavailable or stale, and gives a bounded sequence for unavailable tools.
-   - Risk: Agents may treat the bounded sequence as a full substitute and still mark guidance `VALID`, or they may stop completely even when a bounded `INVALID` / cannot-verify result would be useful.
-   - Suggested improvement: Clarify that a declared tool must be attempted first. If it is unavailable or stale, the agent may use the bounded sequence only to classify conservatively, and should not report `VALID` unless the generated claims are fully evidenced without the missing tool.
+2. **Templates are safer than before, but still invite overfilled generated sections.**
+   - Evidence: `skills/agents-tree/assets/root.AGENTS.md`, `module.AGENTS.md`, and `leaf.AGENTS.md` now warn that unresolved placeholders make guidance invalid. They still copy a full generated structure with `Decision Compression`, `Use`, `Skip`, `First Hop`, `Cross-Module`, `Verification`, and `Evidence Notes` plus multiple placeholder bullets.
+   - Risk: The skill tells agents to delete unused headings, but weaker agents may fill every placeholder and create long guidance even when only one or two routing rules are justified.
+   - Suggested improvement: Add a smaller minimal template variant, or move most optional headings into a commented example block so the default copied artifact starts with only `Knowledge Status`, one decision-cost line, and one or two generated sections.
 
-3. **The templates still encourage placeholder-heavy generated sections unless agents aggressively delete them.**
-   - Evidence: `assets/root.AGENTS.md`, `assets/module.AGENTS.md`, and `assets/leaf.AGENTS.md` include many headings and multiple placeholder bullets. They include comments telling agents to delete unused headings, but the copied starting point is still relatively large.
-   - Risk: Less disciplined agents may fill every heading, turning a decision guide into a mini-encyclopedia or stale review checklist.
-   - Suggested improvement: Consider adding a smaller “minimal generated block” template or make the current templates more visibly optional by grouping extra headings under a commented example block that should not be copied verbatim.
-
-4. **`agents/openai.yaml` is too narrow compared with the v0.2 product contract.**
-   - Evidence: `skills/agents-tree/agents/openai.yaml` default prompt says: “Use $agents-tree to create, check, or refresh this project's decision guidance.” It omits review mode, sidecar mode, human-section protection, and stale/invalid knowledge.
-   - Risk: The manifest is not wrong, but it undersells the core safety contract and may train users to invoke only write-oriented workflows.
-   - Suggested improvement: Include “review,” “sidecar when explicit,” and “preserve human-maintained sections” in the short description or default prompt if the manifest surface supports it.
-
-5. **Audience-boundary repeat suppression depends on comparing reviewed docs since `checked_at_commit`, but the procedure is not fully mechanical.**
-   - Evidence: `file-contract.md` defines `audience_boundary_review.checked_at_commit`, `status`, and `files`; `maintenance-workflow.md` says not to repeat suggestions when all listed files have not changed since that commit.
-   - Risk: In repositories with no usable commit SHA, shallow history, renamed docs, or sidecar-only guidance, agents may repeat suggestions or suppress them incorrectly.
-   - Suggested improvement: Add a short rule: if `checked_at_commit` is `unknown` or cannot be compared, report the review state as uncertain and do not write `resolved` or suppress new suggestions unless the user confirms.
+3. **Install/update docs still do not make loaded-copy verification concrete enough for local review reruns.**
+   - Evidence: `INSTALL.md` and `INSTALL.zh.md` say to restart Codex and confirm `agents-tree` is visible, but they do not tell reviewers how to verify whether Codex loaded the user-level copy, a project-level copy, or the current working-tree copy.
+   - Risk: During skill review, an agent can accidentally evaluate an installed stale copy while the repository copy has changed, or vice versa. This matters because the skill is distributed by copying directories.
+   - Suggested improvement: Add a post-update review note: when testing changes, explicitly read `skills/agents-tree/SKILL.md` from the repository under review, or reinstall and confirm the loaded skill path/version before running the prompt.
 
 ## Minor Issues
 
-1. `README.md` uses “knowledge” language in several headings and paragraphs even though v0.2 is intentionally framed as “decision guidance.” This is understandable historically, but replacing the highest-visibility instances with “guidance” or “generated guidance” would reduce drift.
+1. `README.md` still says "The exact classifier should combine Git diffs with optional code graph..." which can sound like an implementation promise, while the project is still skill-and-file-contract-first. "A reviewer may combine..." would better match the current stage.
 
-2. `README.zh.md` still says “决策压缩树” in install-related wording. That is close to the current concept, but “AGENTS.md 兼容决策指引” is more consistent with the v0.2 framing.
+2. `AGENTS.md` says generated guidance files "should use YAML front matter," while `file-contract.md` says maintained decision-guidance artifacts "must begin with YAML front matter." The stronger wording should be mirrored in project instructions.
 
-3. `file-contract.md` says “Every maintained decision-guidance artifact should begin with YAML front matter.” The rest of the contract treats metadata as required for maintained generated guidance. “Must begin” would be more executable than “should begin.”
+3. The templates' default human sections say "Add human-maintained ... notes here." That is useful for scaffolding, but if not deleted it creates a fake human section. The placeholder invalid rule likely covers this in spirit, but the exact phrase is not listed in the invalid placeholder examples.
 
-4. `SKILL.md` says to use sidecar mode only when the target project explicitly wants separated guidance, but the “Mode Selection” section does not mention that artifact strategy is a separate decision from Create/Check/Refresh/Review. A one-line reminder would help.
+4. Conflict behavior is strong, but `maintenance-workflow.md` still includes the minimal conflict block example. It is acceptable, yet agents may copy only the minimal version even when related files or evidence links are known.
 
-5. Conflict examples are now strong, but the short conflict block in `maintenance-workflow.md` could point back to `file-contract.md` as the canonical expanded shape to avoid agents copying only the minimal block when richer evidence is available.
-
-6. Installation docs say Codex supports user-level and project-level skills, but they do not mention how to verify which skill directory Codex actually loaded if multiple copies exist. This may matter during local development and review re-runs.
+5. `README.zh.md` uses both "决策压缩层" and "决策指引"; this is understandable, but high-visibility wording would be cleaner if it consistently led with "AGENTS.md 兼容决策指引."
 
 ## Missing Scenarios
 
-1. **Sidecar setup when root `AGENTS.md` is strict and human-owned**
-   - The scenario prompt covers this in simulation, but the core docs should explicitly say whether adding the root sidecar pointer requires separate human approval.
+1. **Minimal valid root guidance with no code symbols**
+   - The contract allows empty `critical_files` and `critical_symbols` only with concrete evidence notes and low confidence, but there is no small example of a root index that is valid based on repository structure or explicit human notes rather than symbols.
 
-2. **Declared code-intelligence tool is configured but stale, broken, or partially indexed**
-   - The docs mention unavailable or stale tools, but they should say what status to report and when `last_verified_commit` may advance.
+2. **Template scaffolding before evidence is available**
+   - The docs classify placeholders as invalid, but they do not say whether a partially scaffolded draft should be left uncommitted only, marked `INVALID`, or avoided entirely until evidence exists.
 
-3. **A target project already has both native `AGENTS.md` generated guidance and sidecar `decision-router.md` generated guidance**
-   - The docs say not to maintain both and to ask whether to migrate, merge, or leave separate. A conflict or overlap block example would help prevent agents from silently choosing one source as authoritative.
+3. **Resolving native/sidecar overlap**
+   - The docs correctly stop and ask when both exist, but there is no example of how to record a human decision to migrate, intentionally split, or retire one artifact in the nearest authoritative guidance file.
 
-4. **Project has no usable Git commit but wants initial guidance**
-   - `file-contract.md` says use `last_verified_commit: unknown`, `confidence: low`, and do not classify as `VALID`. A short initial-creation example would clarify whether generated guidance is allowed and what `Knowledge Status` should say.
+4. **Testing loaded skill copies during development**
+   - The install docs lack a scenario for local reviewers who have both `skills/agents-tree/` in the repo and `~/.agents/skills/agents-tree` installed.
 
-5. **Audience-boundary metadata after file rename**
-   - If `README.md` is renamed or split, it is unclear whether repeat suppression should be invalidated, migrated, or reported as uncertain.
-
-6. **Review mode against a proposed diff rather than an existing target file**
-   - `Review Mode` is good for an existing `AGENTS.md`, but agents also need to review pull-request diffs that add or change generated guidance before merge.
-
-7. **Templates copied but placeholders not fully replaced**
-   - The contract does not explicitly classify unresolved placeholders such as `TASK_SHAPE`, `COMMIT_SHA`, or `DECISION_1` as invalid.
-
-8. **Multiple repositories inside one workspace with sidecar pointers**
-   - `last_verified_commit` multi-repo handling is clear, but sidecar root pointer discovery across nested repos or monorepos could use one example.
+5. **Conflict block resolution note format**
+   - The contract requires a short resolution note for `status: resolved`, but it does not show a compact resolved conflict example.
 
 ## Suggested Edits With Exact File / Section
 
-1. **`skills/agents-tree/references/file-contract.md` / `### Sidecar Decision-Router Mode`**
-   - Add: “If the required root `AGENTS.md` pointer would modify a human-owned, strict, or unmarked `AGENTS.md`, ask for explicit approval before editing it. If approval is not given, report that sidecar guidance exists but may not be reliably discovered.”
+1. **`README.md` / `## Freshness States`**
+   - Change `VALID` from "no relevant evidence changed since `last_verified_commit`" to: "`VALID`: recorded critical evidence, relevant current diffs/flows, and generated claims were checked and still support the guidance."
 
-2. **`skills/agents-tree/SKILL.md` / `## Artifact Strategy`**
-   - Add a pointer-safety bullet: “Sidecar mode requires a discoverability pointer, but adding that pointer to an existing human-owned instruction file is a separate explicit edit.”
+2. **`README.zh.md` / `## 新鲜度状态`**
+   - Mirror the stricter `VALID` wording: "`VALID`：已复查记录的关键证据、相关当前 diff/流程，以及自动生成结论，仍能支撑这份指引。"
 
-3. **`skills/agents-tree/SKILL.md` / `## Workflow` step 5**
-   - Change the tool rule to: “If applicable project guidance declares a code graph or code-intelligence tool, MUST attempt it first before creating, reviewing, or refreshing generated knowledge. If it is unavailable or stale, follow the bounded no-tool sequence in `maintenance-workflow.md` and classify conservatively.”
+3. **`AGENTS.md` / `## File Contract`**
+   - Change "Generated native `AGENTS.md` files and explicit sidecar decision-guidance files should use YAML front matter" to "must begin with YAML front matter" to match `file-contract.md`.
 
-4. **`skills/agents-tree/references/maintenance-workflow.md` / `## Evidence Collection`**
-   - Add: “When a declared code-intelligence tool is unavailable or stale, record that limitation in `Evidence Notes` or the review report. Do not advance `last_verified_commit` to a fresh `VALID` state unless all generated claims are fully re-evidenced.”
+4. **`skills/agents-tree/assets/*.AGENTS.md` / generated template body**
+   - Add a short line near the human marker: "Delete this placeholder human section unless a human supplies real notes." Or include `Add human-maintained` in the unresolved-placeholder invalid examples.
 
-5. **`skills/agents-tree/assets/*.AGENTS.md` / generated template comments**
-   - Add an invalid-placeholder warning near the top: “Before committing, replace or delete all placeholders such as `COMMIT_SHA`, `TASK_SHAPE`, `DECISION_1`, and `SymbolName`; unresolved placeholders make this guidance invalid.”
+5. **`skills/agents-tree/assets/*.AGENTS.md` / template shape**
+   - Consider replacing the full default section list with a minimal generated block and a commented optional-section example.
 
-6. **`skills/agents-tree/references/file-contract.md` / `## Freshness Review`**
-   - Add unresolved template placeholders to the `INVALID` checklist.
+6. **`INSTALL.md` and `INSTALL.zh.md` / `## Post-Install Check` and `## Update The Skill`**
+   - Add a local review note: when rerunning skill-review prompts, verify whether the agent is using the repository copy or the installed copy; reinstall or explicitly point the prompt to the repository `skills/agents-tree/SKILL.md`.
 
-7. **`skills/agents-tree/agents/openai.yaml`**
-   - Broaden the default prompt to include review and safety:
-     ```yaml
-     default_prompt: "Use $agents-tree to create, check, refresh, or review this project's AGENTS.md-compatible decision guidance while preserving human-maintained sections."
-     ```
+7. **`skills/agents-tree/references/file-contract.md` / `## Conflict Sections`**
+   - Add a compact `status: resolved` example with a required resolution note.
 
-8. **`skills/agents-tree/references/maintenance-workflow.md` / `## Review Mode`**
-   - Add a short PR-diff variant: “When reviewing proposed guidance changes, compare the diff against the current file contract, recorded evidence, parent guidance, and generated/human section boundaries before rating token-saving value.”
-
-9. **`skills/agents-tree/references/maintenance-workflow.md` / `## Audience Boundary Review`**
-   - Add: “If `checked_at_commit` cannot be compared, or a listed file was renamed/deleted, report repeat-suppression state as uncertain and re-run the advisory check without writing `resolved` unless the user approves.”
-
-10. **`README.md` and `README.zh.md` / high-visibility “knowledge” wording**
-    - Keep metadata and freshness terms where useful, but prefer “decision guidance” for user-facing product identity.
+8. **`skills/agents-tree/references/maintenance-workflow.md` / `## Choose Artifact Strategy First`**
+   - Add a short example of recording a human-approved native-to-sidecar migration or intentional split.
 
 ## Answers To Review Goals
 
-1. **Trigger condition:** Clear. The skill description strongly targets AGENTS.md-compatible decision guidance, sidecar guidance, freshness metadata, generated sections, and stale guidance.
+1. **Trigger condition:** Clear. The skill description explicitly covers creating, checking, refreshing, and reviewing directory-scoped AGENTS.md-compatible decision guidance, native `AGENTS.md`, sidecar `decision-router.md`, freshness metadata, generated sections, human-protected sections, and stale guidance.
 
-2. **Create / Check / Refresh / Review:** Clear and much more executable than v0.1. The only remaining gap is separating operating mode from artifact-strategy approval in sidecar setup.
+2. **Create / Check / Refresh / Review:** Clear. Operating modes and mode selection are actionable, and check-only/review-only requests are protected from edits.
 
-3. **`SKILL.md` concision:** Good. It is concise but not under-specified, and it points to `references/` for exact metadata, sidecar rules, markers, conflicts, and freshness.
+3. **`SKILL.md` concision:** Strong. It stays concise while pointing agents to `file-contract.md` for exact metadata and freshness rules and `maintenance-workflow.md` for placement, conflicts, and refresh behavior.
 
-4. **Native vs sidecar separation:** Directionally strong. Native remains default, sidecar is explicit, and overlap is prohibited. Pointer editing in human-owned root `AGENTS.md` needs one more safety rule.
+4. **Native vs sidecar separation:** Strong. Native remains default; sidecar requires explicit project reason, owner root, discoverability pointer, and explicit approval before editing human-owned or unmarked root `AGENTS.md`.
 
-5. **Generated / human / conflict sections:** Strong. Marker validation, byte-for-byte human preservation, unmarked migration, and whole-file human ownership are all clear.
+5. **Generated / human / conflict sections:** Strong. Marker validation, byte-for-byte preservation, whole-file human ownership, unmanaged text protection, unresolved placeholder invalidation, and conflict blocks are clear.
 
-6. **Unresolved conflict safety:** Strong. The docs correctly block guidance maintenance for the affected file/subtree without blocking unrelated code work or unrelated nodes, and they include examples.
+6. **Unresolved conflict safety:** Strong. The docs block guidance maintenance for the affected file and subtree without blocking unrelated code work or unrelated tree nodes.
 
-7. **Keep / skip:** Strong. Existing ignore files come first; keep is small and cannot reopen sensitive or generated paths without explicit human request.
+7. **Keep / skip:** Strong. Existing ignore files come first; keep/skip are small, safety-limited, and recorded evidence cannot be hidden by skip rules.
 
-8. **Cross-module relationships:** Strong. The skill consistently delegates live callers, references, and impact analysis to code-intelligence or bounded focused evidence rather than durable guidance.
+8. **Cross-module relationships:** Strong. Live callers, references, and dependency inventories are delegated to code graph or code-intelligence tools, while guidance stores only stable handoff rules.
 
-9. **Generated bullets change next action:** Very clear. This is repeated in the skill, file contract, workflow, and templates.
+9. **Generated bullets change next action:** Very clear. This rule appears in `SKILL.md`, `file-contract.md`, `maintenance-workflow.md`, and the templates.
 
-10. **Reasoning-token value:** Clear and credible. The docs explain that guidance reduces first-hop and routing reasoning without replacing code reading.
+10. **Review Mode proposed-diff safety:** Clear. `SKILL.md` and `maintenance-workflow.md` now tell agents to compare proposed diffs against the previous file and flag deletion, movement, wrapping, or rewriting of human/unmanaged text without explicit approval.
 
-11. **Contradictions / repetition / vague rules:** No blocking contradictions. The main tension is the declared code-intelligence `MUST` versus unavailable-tool sequence. Some “knowledge” wording remains from v0.1, but it does not break execution.
+11. **Reasoning-token value:** Clear. The docs explain first-hop reasoning, code-intelligence targeting, boundary checks, verification choice, and concrete skip reasoning without claiming guidance replaces source reading.
 
-12. **Non-installed agent readability:** Good. Conflict blocks and `Knowledge Status` are visible and understandable without the skill installed.
+12. **Contradictions / repetition / vague rules:** No blocking contradictions found. Remaining looseness is mostly in README-level freshness wording and template size, not in the executable contract.
+
+13. **Non-installed agent readability:** Good. `Knowledge Status` and conflict blocks are visible and human-readable without the skill installed.
 
 ## Overall Readiness Score
 
-**8.5 / 10**
+**9 / 10**
 
-The v0.2 decision-guidance version is ready for realistic manual use and fresh-session pressure testing. It has a coherent product boundary, strong human-section protection, concrete freshness rules, and a clear anti-encyclopedia stance. The remaining work is mostly edge-case hardening around sidecar discoverability, declared-but-unavailable code-intelligence tools, unresolved template placeholders, and review workflows for proposed diffs.
+The updated v0.2 skill is ready for realistic manual use and stronger fresh-session testing. The core safety contract is now explicit: native mode by default, sidecar only with approval-safe discoverability, no hidden stale evidence, no silent human-text rewrites, no durable caller inventories, and no placeholder-filled "valid" guidance. The remaining work is polish and pressure-test coverage rather than foundational repair.
