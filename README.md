@@ -318,7 +318,7 @@ Root and parent files should behave like indexes. They may include short respons
 - Keep only generated bullets that change the next action.
 - Make skip guidance concrete: if the task is only X, go to Y or query Z instead.
 - Do not duplicate parent guidance in child files.
-- Use `Clarification Needed` only for durable ambiguity that affects future routing; keep recent touches to 3-5 dates.
+- Use `Clarification Needed` only for durable ambiguity that affects future decisions; keep recent touches to 3-5 dates.
 - Record evidence for every generated claim.
 - Treat stale guidance as worse than missing guidance.
 - Preserve human-maintained notes during agent-driven refresh.
