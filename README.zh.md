@@ -320,6 +320,8 @@ AGENTS.md 负责启动本地推理。
 
 # Verification Hints
 
+# Clarification Needed
+
 # Evidence Notes
 ```
 
@@ -334,6 +336,7 @@ AGENTS.md 负责启动本地推理。
 - 只保留能改变下一步行动的自动生成 bullet。
 - `Skip` 指引必须具体：如果任务只是 X，就不要先读这里，改去 Y 或查询 Z。
 - 子文件不要重复父文件已经说过的内容。
+- `Clarification Needed` 只用于影响后续任务分流的稳定模糊点，最近触碰时间保留 3-5 个日期。
 - 自动生成的结论必须能追溯到文件、符号、调用流或人工说明。
 - 过期指引比没有指引更危险。
 - Agent 刷新指引时必须保护人工维护段落。

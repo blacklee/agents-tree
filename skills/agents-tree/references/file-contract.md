@@ -170,7 +170,7 @@ This section helps humans and agents that do not have Agents Tree installed noti
 
 Generated content should reduce future task-routing decisions. It should answer which child module owns a task, what current design boundary or rule should guide the next action, what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
 
-Do not use generated sections as module summaries. Parent files may include short child responsibility maps when they help choose among child subtrees, but each responsibility bullet must change the next action. If current design intent is too ambiguous to support a concrete decision rule, report that it needs clarification instead of writing vague guidance. Keep directory scope context short and write decision rules that help future agents act:
+Do not use generated sections as module summaries. Parent files may include short child responsibility maps when they help choose among child subtrees, but each responsibility bullet must change the next action. If current design intent is too ambiguous to support a concrete decision rule, record a concise `Clarification Needed` section instead of writing vague guidance. Keep directory scope context short and write decision rules that help future agents act:
 
 ```md
 ## Use This File When
@@ -196,6 +196,14 @@ Do not use generated sections as module summaries. Parent files may include shor
 ## Verification Hints
 
 - Permission rule changes are usually proved by `tests/permissions.test.ts`.
+
+## Clarification Needed
+
+- Current design intent unclear: `BOUNDARY_OR_RULE`.
+- Decision affected: whether future agents should `ACTION_A` or `ACTION_B`.
+- Ask the user: should this area follow `OPTION_A`, `OPTION_B`, or another rule?
+- Until clarified: inspect current code directly and do not record a generated rule for this boundary.
+- Recent touches: `2026-06-05`, `2026-06-12`, `2026-06-20`.
 ```
 
 Negative guidance is allowed when it saves reasoning tokens, such as naming files or subtrees that should not be read first for a stable task shape. Do not add negative guidance as a broad prohibition; it must be scoped and evidence-backed.
@@ -221,6 +229,13 @@ Use a short visible section when a file contains more than a few generated claim
 Evidence notes should name the evidence type used, such as code graph query/context, source scan, tests, explicit human note, or commit diff. For generated claims involving flows, prefer code graph or process evidence when available.
 
 When a generated rule depends on clarified current design intent, name the evidence as an explicit human note or user-provided context and keep the resulting rule action-oriented.
+
+`Clarification Needed` is a temporary generated section for durable ambiguity that would otherwise be rediscovered. Keep it short:
+
+- Include only the unclear boundary or rule, the affected decision, the user question, the interim action, and `Recent touches`.
+- Keep `Recent touches` to the latest 3-5 dates in `YYYY-MM-DD` form.
+- Append a touch date only when the ambiguity affects the current task's next action.
+- Once clarified, remove the section and replace it with concrete generated guidance plus an `Evidence Notes` entry for the user-provided context.
 
 Keep evidence notes concise. Do not turn them into a citation table or live dependency list.
 
@@ -308,6 +323,7 @@ Root and module files should use a small subset of:
 # First Hop Rules
 # Cross-Module Checks
 # Verification Hints
+# Clarification Needed
 # Do Not
 # Evidence Notes
 ```

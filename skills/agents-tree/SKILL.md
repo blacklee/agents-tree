@@ -31,7 +31,7 @@ Before creating a child guidance file, state the specific decision cost it saves
 
 Prefer parent guidance for comparing child module responsibilities. Parent files may include short child responsibility maps only when the map routes agents to the correct child subtree or tells them which child subtree to skip first. Child files should not repeat the parent map unless a local override is explicit and useful.
 
-If current design intent is too ambiguous to support a routing rule, boundary check, or verification hint, ask the user to clarify it instead of generating vague guidance.
+If current design intent is too ambiguous to support a routing rule, boundary check, or verification hint, record a short `Clarification Needed` section in the nearest managed guidance artifact instead of generating vague guidance. Keep only the latest 3-5 touch dates in that section so future agents can avoid repeating the same discovery and can remind the user at a reasonable interval.
 
 Every generated bullet must change the next action for a future agent: what to read, what to query, what boundary to check, what to skip, or how to choose verification. If a bullet does not change the next action, delete it.
 
@@ -128,7 +128,7 @@ Before writing or refreshing generated content:
 - verify `critical_files` paths exist and `critical_symbols` resolve to real symbols
 - check recorded critical evidence even when it matches `agents_tree_skip`; skip rules cannot hide freshness evidence
 - ensure generated claims are traceable to files, symbols, imports, execution flows, tests, or explicit human notes
-- request clarification when current design intent is ambiguous and would affect generated guidance
+- record a concise `Clarification Needed` section when current design intent is ambiguous and would affect generated guidance
 - replace or delete template placeholders before treating a guidance artifact as valid
 - treat stale or invalid guidance as worse than missing guidance
 - advance `last_verified_commit` only after recorded evidence and relevant current diffs or graph evidence have been checked against committed code state
