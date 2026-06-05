@@ -11,13 +11,14 @@ Maintain verified AGENTS.md-compatible decision guidance inside the target proje
 
 This skill is the maintenance workflow, not the target guidance itself. Maintained guidance belongs to the target repository, is committed there, and must remain useful without this skill installed.
 
-Generated guidance files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
+Generated guidance files should compress future agent decisions, not summarize the directory. Their first job is to help the next agent decide which child module owns a task, what to inspect first, what to check with code-intelligence tools, which boundaries may be affected, which verification is relevant, and when this file can be skipped.
 
 ## Decision Compression Value
 
 Create or refresh generated guidance only when it reduces concrete future reasoning cost:
 
 - first-hop reasoning: where the next agent should start for a known task shape
+- module-responsibility reasoning: which child subtree owns a task shape
 - code-intelligence targeting: which symbol, file, or flow to query first
 - boundary reasoning: when a change must cross-check another module
 - verification reasoning: which focused checks usually prove this area
@@ -26,6 +27,8 @@ Create or refresh generated guidance only when it reduces concrete future reason
 Use code graph, code-intelligence, structural search, or language-aware navigation for live facts. Use maintained guidance files for stable decision rules that route agents toward those facts. Do not store current caller lists, dependency inventories, consumer lists, or full API maps in generated sections unless the relationship is an intentionally stable contract.
 
 Before creating a child guidance file, state the specific decision cost it saves. If the answer is vague, do not create the file.
+
+Prefer parent guidance for comparing child module responsibilities. Parent files may include short child responsibility maps only when the map routes agents to the correct child subtree or tells them which child subtree to skip first. Child files should not repeat the parent map unless a local override is explicit and useful.
 
 Every generated bullet must change the next action for a future agent: what to read, what to query, what boundary to check, what to skip, or how to choose verification. If a bullet does not change the next action, delete it.
 
@@ -80,7 +83,7 @@ Do not update guidance for every code change. Update it only when the change aff
 6. Choose artifact strategy: native `AGENTS.md` by default; sidecar only with an explicit project reason, an owner repository root, and a discoverability pointer that is safe to edit or explicitly approved.
 7. Decide whether the target directory needs a guidance file; state the decision-compression reason before creating a child file.
 8. If the target directory contains both human-facing and agent-facing docs, run an Audience Boundary Review unless unchanged metadata says it was already suggested, dismissed, or resolved.
-9. Preserve parent/child separation: root files route agents; leaf files hold concrete local guidance.
+9. Preserve parent/child separation: parent files route agents and compare child responsibilities; leaf files hold concrete local guidance.
 10. Write generated sections as routing rules: concrete skip rules, first-hop rules, cross-module checks, and verification-choice hints.
 11. Update only managed generated sections unless the user explicitly asks to edit human sections.
 12. If generated guidance contradicts a human section, write or preserve an unresolved conflict block instead of overwriting either side.

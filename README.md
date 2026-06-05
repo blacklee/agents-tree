@@ -20,11 +20,12 @@ Large repositories make coding agents repeatedly pay for the same work:
 - deciding whether old documentation is still trustworthy
 - redoing architecture reasoning before each small change
 
-Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated decision-making about where to inspect, what to query, which boundaries to check, and what to ignore first.
+Code graph, repo map, and semantic search tools reduce the cost of reading code. Agents Tree focuses on a different cost: repeated decision-making about which module owns a task, where to inspect, what to query, which boundaries to check, and what to ignore first.
 
 That is why short verified guidance can make reasoning faster and spend fewer reasoning tokens. A future agent can read a few decision rules before opening broad source context:
 
 - start from the likely entry point instead of rediscovering it from filenames
+- choose the owning child module from a parent responsibility map before reading child subtrees one by one
 - skip tempting files or subtrees that are usually irrelevant for a task shape
 - query the right symbol, flow, or boundary in a code-intelligence tool first
 - choose a focused verification path instead of guessing a test surface from scratch
@@ -32,7 +33,7 @@ That is why short verified guidance can make reasoning faster and spend fewer re
 
 The guidance does not replace code reading. It reduces the number of reasoning turns needed before the agent knows which code to read and which evidence to trust.
 
-It does that by guiding an agent to maintain a small decision-guidance layer across the target repository. By default that layer is a tree of `AGENTS.md` files: root files stay short and act like indexes, while lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
+It does that by guiding an agent to maintain a small decision-guidance layer across the target repository. By default that layer is a tree of `AGENTS.md` files: root and parent files stay short and act like indexes, optionally naming the few child responsibilities needed to route tasks, while lower-level files become more specific about local first hops, skip rules, boundary checks, and verification paths.
 
 ## Core Idea
 
@@ -193,7 +194,7 @@ Good candidates include directories with:
 - historical compatibility logic
 - frequent agent access
 
-Root files should stay short and point agents toward the right subtree. Leaf files may carry more concrete implementation guidance.
+Parent files should stay short and point agents toward the right subtree. They may include a small child responsibility map when it helps agents decide which child module owns a task. Leaf files may carry more concrete implementation guidance.
 
 ## Freshness Review
 
@@ -291,6 +292,8 @@ Generated files should stay short and decision-oriented:
 
 # Use This File When
 
+# Child Responsibility Map
+
 # Skip This File When
 
 # First Hop Rules
@@ -302,12 +305,13 @@ Generated files should stay short and decision-oriented:
 # Evidence Notes
 ```
 
-Root-level files should behave like indexes. Leaf-level files may include implementation details.
+Root and parent files should behave like indexes. They may include short responsibility maps for child subtrees when those maps change routing decisions. Leaf-level files may include implementation details.
 
 ## Design Principles
 
 - Prefer trustworthy short context over exhaustive documentation.
 - Keep root guidance abstract and leaf guidance concrete.
+- Use parent guidance to compare child-module responsibilities; do not make each child file restate the child-module map.
 - Prefer task-routing and first-hop rules over directory summaries.
 - Keep only generated bullets that change the next action.
 - Make skip guidance concrete: if the task is only X, go to Y or query Z instead.

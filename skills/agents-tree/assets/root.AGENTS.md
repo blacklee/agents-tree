@@ -32,6 +32,11 @@ agents_tree_skip: []
 - Use this when deciding which top-level module or workflow owns a task.
 - Use this when checking project-wide rules before entering a child subtree.
 
+## Child Responsibility Map
+
+- `path/to/module-a`: owns `TASK_SHAPE`; start here before reading other child modules.
+- `path/to/module-b`: owns `OTHER_TASK_SHAPE`; skip this for `UNRELATED_TASK_SHAPE` and go to `path/to/module-c`.
+
 ## Skip This File When
 
 - If the task only changes `KNOWN_LEAF_SYMBOL`, do not read this file first; read `path/to/leaf/AGENTS.md`.

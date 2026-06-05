@@ -32,6 +32,11 @@ agents_tree_skip: []
 - Use this when deciding where to start inside this module for `TASK_SHAPE`.
 - Use this before changing local boundaries, exported data shapes, or durable rules.
 
+## Child Responsibility Map
+
+- `path/to/child-a`: owns `TASK_SHAPE`; start here before reading other child modules.
+- `path/to/child-b`: owns `OTHER_TASK_SHAPE`; skip this for `UNRELATED_TASK_SHAPE` and go to `path/to/child-c`.
+
 ## Skip This File When
 
 - If the task only changes implementation inside `KnownSymbol`, do not read this file first; inspect `path/to/known/file`.

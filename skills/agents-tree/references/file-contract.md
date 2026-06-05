@@ -168,14 +168,18 @@ This section helps humans and agents that do not have Agents Tree installed noti
 
 ## Decision Compression
 
-Generated content should reduce future task-routing decisions. It should answer what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
+Generated content should reduce future task-routing decisions. It should answer which child module owns a task, what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
 
-Do not use generated sections as module summaries. Keep directory scope context short and write decision rules that help future agents act:
+Do not use generated sections as module summaries. Parent files may include short child responsibility maps when they help choose among child subtrees, but each responsibility bullet must change the next action. Keep directory scope context short and write decision rules that help future agents act:
 
 ```md
 ## Use This File When
 
 - Read this before broad source inspection when deciding where permission rules live.
+
+## Child Responsibility Map
+
+- `path/to/child-module`: owns `TASK_SHAPE`; start here before reading other child subtrees.
 
 ## Skip This File When
 
@@ -295,7 +299,9 @@ Root and module files should use a small subset of:
 
 ```md
 # Knowledge Status
+# Decision Compression
 # Use This File When
+# Child Responsibility Map
 # Skip This File When
 # First Hop Rules
 # Cross-Module Checks

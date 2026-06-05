@@ -62,6 +62,7 @@ Do not update the tree for every code change. Small implementation edits that do
 
 - Root files act as indexes and route agents to the next decision point.
 - Mid-level files describe stable task-routing rules, boundaries, and common first hops.
+- Parent files may include short child responsibility maps when child ownership is the recurring decision cost.
 - Leaf files may describe stable implementation decisions only when they reduce future task branching.
 - Child files must not repeat parent guidance.
 - Lower files may override parent rules only when the override is explicit and local.
@@ -91,13 +92,14 @@ Do not write lists of current callers, imports, references, or consumers into `A
 Prefer decision-compression sections over module-summary sections:
 
 - `Use This File When`: task shapes where this file should be read before broad source inspection.
+- `Child Responsibility Map`: short parent-level bullets that name which child subtree owns a task shape and when to skip other child subtrees.
 - `First Hop Rules`: stable rules of the form "if task is X, start with Y."
 - `Skip This File When`: concrete task shapes where another file, subtree, or code graph query should come first.
 - `Cross-Module Checks`: stable boundary checks and the code-intelligence targets to inspect before editing across them.
 - `Verification Hints`: focused tests, commands, or review steps that usually prove this area.
 - `Evidence Notes`: concise evidence types behind the generated claims.
 
-Keep scope context short. A one-line ownership snapshot is useful when it explains why the routing rules apply, but directory responsibilities should not dominate the generated section.
+Keep scope context short. Parent-level responsibility maps are useful when they choose among child subtrees, but directory responsibilities should not dominate the generated section. Do not add a child responsibility bullet unless it changes which subtree the next agent reads, queries, skips, or verifies.
 
 Allow negative guidance when it saves reasoning tokens, such as "do not start from `__init__.py` for permission bugs" or "transport-only changes usually do not require reading the full services subtree." Negative guidance must be evidence-backed and scoped to stable task shapes.
 
@@ -238,6 +240,7 @@ After refresh, verify:
 When reviewing an `AGENTS.md`, assess whether it reduces future decision cost:
 
 - Does it route agents to the right first file, symbol, flow, or code-intelligence query?
+- Does parent guidance help choose the owning child module without becoming a directory summary?
 - Does it say concretely when the file should be skipped and where to go instead?
 - Does every generated bullet change the next action?
 - Does it prevent repeated discovery of stable boundaries?
