@@ -168,9 +168,9 @@ This section helps humans and agents that do not have Agents Tree installed noti
 
 ## Decision Compression
 
-Generated content should reduce future task-routing decisions. It should answer which child module owns a task, what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
+Generated content should reduce future task-routing decisions. It should answer which child module owns a task, what current design boundary or rule should guide the next action, what to read or query first, when to skip this file, which stable boundaries require code-intelligence checks, and which focused verification usually proves a change.
 
-Do not use generated sections as module summaries. Parent files may include short child responsibility maps when they help choose among child subtrees, but each responsibility bullet must change the next action. Keep directory scope context short and write decision rules that help future agents act:
+Do not use generated sections as module summaries. Parent files may include short child responsibility maps when they help choose among child subtrees, but each responsibility bullet must change the next action. If current design intent is too ambiguous to support a concrete decision rule, report that it needs clarification instead of writing vague guidance. Keep directory scope context short and write decision rules that help future agents act:
 
 ```md
 ## Use This File When
@@ -219,6 +219,8 @@ Use a short visible section when a file contains more than a few generated claim
 ```
 
 Evidence notes should name the evidence type used, such as code graph query/context, source scan, tests, explicit human note, or commit diff. For generated claims involving flows, prefer code graph or process evidence when available.
+
+When a generated rule depends on clarified current design intent, name the evidence as an explicit human note or user-provided context and keep the resulting rule action-oriented.
 
 Keep evidence notes concise. Do not turn them into a citation table or live dependency list.
 

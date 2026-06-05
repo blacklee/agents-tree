@@ -16,7 +16,7 @@ Large repositories make coding agents repeatedly pay for the same work:
 
 - finding the relevant files
 - inferring module responsibilities
-- reconstructing historical design intent
+- inferring current design intent
 - deciding whether old documentation is still trustworthy
 - redoing architecture reasoning before each small change
 

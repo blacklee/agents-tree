@@ -19,6 +19,7 @@ Create or refresh generated guidance only when it reduces concrete future reason
 
 - first-hop reasoning: where the next agent should start for a known task shape
 - module-responsibility reasoning: which child subtree owns a task shape
+- current-design-intent reasoning: which current boundary or rule should guide the next action
 - code-intelligence targeting: which symbol, file, or flow to query first
 - boundary reasoning: when a change must cross-check another module
 - verification reasoning: which focused checks usually prove this area
@@ -29,6 +30,8 @@ Use code graph, code-intelligence, structural search, or language-aware navigati
 Before creating a child guidance file, state the specific decision cost it saves. If the answer is vague, do not create the file.
 
 Prefer parent guidance for comparing child module responsibilities. Parent files may include short child responsibility maps only when the map routes agents to the correct child subtree or tells them which child subtree to skip first. Child files should not repeat the parent map unless a local override is explicit and useful.
+
+If current design intent is too ambiguous to support a routing rule, boundary check, or verification hint, ask the user to clarify it instead of generating vague guidance.
 
 Every generated bullet must change the next action for a future agent: what to read, what to query, what boundary to check, what to skip, or how to choose verification. If a bullet does not change the next action, delete it.
 
@@ -125,6 +128,7 @@ Before writing or refreshing generated content:
 - verify `critical_files` paths exist and `critical_symbols` resolve to real symbols
 - check recorded critical evidence even when it matches `agents_tree_skip`; skip rules cannot hide freshness evidence
 - ensure generated claims are traceable to files, symbols, imports, execution flows, tests, or explicit human notes
+- request clarification when current design intent is ambiguous and would affect generated guidance
 - replace or delete template placeholders before treating a guidance artifact as valid
 - treat stale or invalid guidance as worse than missing guidance
 - advance `last_verified_commit` only after recorded evidence and relevant current diffs or graph evidence have been checked against committed code state

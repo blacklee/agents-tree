@@ -101,6 +101,8 @@ Prefer decision-compression sections over module-summary sections:
 
 Keep scope context short. Parent-level responsibility maps are useful when they choose among child subtrees, but directory responsibilities should not dominate the generated section. Do not add a child responsibility bullet unless it changes which subtree the next agent reads, queries, skips, or verifies.
 
+When current design intent is unclear and would change routing, boundary, skip, or verification guidance, report that the intent needs human clarification. Do not turn uncertainty into vague generated guidance.
+
 Allow negative guidance when it saves reasoning tokens, such as "do not start from `__init__.py` for permission bugs" or "transport-only changes usually do not require reading the full services subtree." Negative guidance must be evidence-backed and scoped to stable task shapes.
 
 `Skip This File When` is required to be specific when present. Do not write vague bullets such as "skip this when the target is already clear" or "skip for unrelated changes." Use the form "If the task is only X, do not read this file first; go to Y or query Z."
@@ -241,6 +243,7 @@ When reviewing an `AGENTS.md`, assess whether it reduces future decision cost:
 
 - Does it route agents to the right first file, symbol, flow, or code-intelligence query?
 - Does parent guidance help choose the owning child module without becoming a directory summary?
+- Does it ask for clarification when current design intent is too ambiguous to guide the next action?
 - Does it say concretely when the file should be skipped and where to go instead?
 - Does every generated bullet change the next action?
 - Does it prevent repeated discovery of stable boundaries?
