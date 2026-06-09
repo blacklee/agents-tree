@@ -58,6 +58,7 @@ If the user only asks to check, inspect, analyze, or review, do not edit files u
 ## Mode Selection
 
 - User asks to add missing guidance, start a tree, avoid repeated scans, or reduce task-routing decisions: **Create**.
+- If the user gives only a project name, repository name, or path with no explicit scope or mode, treat it as **Create root only**, subject to Artifact Strategy and Section Safety. Before editing, state that the current task is to create the root `AGENTS.md` as the project-level entry and first-hop routing starting point. After creation, summarize the root guidance and current coverage, then ask whether the user wants to continue into a child-directory Agents Tree pass. Do not scan for or create child guidance files until the user asks for that follow-up.
 - User asks whether current guidance is trustworthy, stale, valid, or safe to use: **Check**.
 - User asks to update, refresh, rewrite generated guidance, or record changed project decision guidance: **Refresh**.
 - User asks to evaluate proposed guidance changes: **Review**.
